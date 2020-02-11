@@ -326,6 +326,36 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </div>
 <div id="read-data" class="section level2">
 <h2>Read Data</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">load</span>(<span class="st">&quot;data.RData&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">summary</span>(data)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt;   ProcedureID      ProcedureAge      AvgCompNum       AvgReviews    </span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt;  Min.   :    37   Min.   : 1.000   Min.   : 0.000   Min.   : 0.000  </span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt;  1st Qu.:  8312   1st Qu.: 3.000   1st Qu.: 0.000   1st Qu.: 0.050  </span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;  Median : 14933   Median : 6.000   Median : 1.389   Median : 0.200  </span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt;  Mean   : 26873   Mean   : 7.104   Mean   : 3.109   Mean   : 0.425  </span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt;  3rd Qu.: 24389   3rd Qu.:10.000   3rd Qu.: 4.353   3rd Qu.: 0.500  </span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt;  Max.   :174448   Max.   :25.000   Max.   :23.000   Max.   :13.500  </span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;   PriceDeposit      PricePaid       PriceOrigin         Public       </span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt;  Min.   :  11.0   Min.   :    11   Min.   :    99   Min.   :0.00000  </span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt;  1st Qu.: 120.0   1st Qu.:   599   1st Qu.:  2800   1st Qu.:0.00000  </span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt;  Median : 256.0   Median :  1280   Median :  4800   Median :0.00000  </span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt;  Mean   : 846.1   Mean   :  5648   Mean   : 11706   Mean   :0.05829  </span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt;  3rd Qu.: 880.0   3rd Qu.:  4909   3rd Qu.: 10000   3rd Qu.:0.00000  </span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt;  Max.   :8000.0   Max.   :190000   Max.   :226999   Max.   :1.00000  </span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt;    SurgeonNum     ReviewBonus             Ad            Financing    </span></span>
+<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt;  Min.   :0.000   Min.   :0.000000   Min.   :0.00000   Min.   :0.000  </span></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt;  1st Qu.:1.000   1st Qu.:0.000000   1st Qu.:0.00000   1st Qu.:0.000  </span></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt;  Median :1.000   Median :0.000000   Median :0.00000   Median :1.000  </span></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt;  Mean   :1.109   Mean   :0.002271   Mean   :0.08478   Mean   :0.732  </span></span>
+<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt;  3rd Qu.:1.000   3rd Qu.:0.000000   3rd Qu.:0.00000   3rd Qu.:1.000  </span></span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt;  Max.   :4.000   Max.   :1.000000   Max.   :1.00000   Max.   :1.000  </span></span>
+<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt;  GroupPurchase      Insurance         AvgSales       </span></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt;  Min.   :0.0000   Min.   :0.0000   Min.   :  0.0000  </span></span>
+<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt;  1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:  0.1053  </span></span>
+<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt;  Median :0.0000   Median :0.0000   Median :  0.5714  </span></span>
+<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt;  Mean   :0.1151   Mean   :0.4822   Mean   :  2.6121  </span></span>
+<span id="cb2-29"><a href="#cb2-29"></a><span class="co">#&gt;  3rd Qu.:0.0000   3rd Qu.:1.0000   3rd Qu.:  2.1250  </span></span>
+<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#&gt;  Max.   :1.0000   Max.   :1.0000   Max.   :103.3600</span></span></code></pre></div>
 </div>
 
 

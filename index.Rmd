@@ -53,6 +53,13 @@ library(anytime)
 
 
 
+```{r,  warning = FALSE}
+load("data.RData")
+summary(data)
+
+```
+
+
 
 
 
