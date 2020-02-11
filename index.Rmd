@@ -1,11 +1,11 @@
 ---
-title: "A Tutorial to Multi-view Sequential Canonical Covariance Analysis"
+title: "A Tutorial to Matching"
 knit: (function(input_file, encoding) {
   out_dir <- 'docs';
   rmarkdown::render(input_file,
  encoding=encoding,
  output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
-author: "[Hongfei Li](https://hongfeiuconn.github.io/personal-website/)"
+author: "[Hongfei Li](https://hongfei-business.com/)"
 date: "Last Updated: `r format(Sys.time(), '%B %d, %Y')`"
 output: 
   rmarkdown::html_vignette:
