@@ -25,40 +25,236 @@ knitr::opts_chunk$set(
 ```
 
 
-This tutorial uses an empirical example to describe what we can achieve from MultiSeqCCoA. The package was written by [Ruoqing Zhu](https://sites.google.com/site/teazrq/). The reference of the paper that put forward this package is recommended as 
+This tutorial uses an empirical example to describe matching strategy. The package was written by [Ruoqing Zhu](https://sites.google.com/site/teazrq/). The reference of the paper that put forward this package is recommended as 
 
-> "Cao X, Folta T, Li H, Zhu R (2019) A New Method to Understand the Online Word of Mouth Dynamics: Multi-View Sequential Canonical Covariance Analysis"
+> "Li H, Peng J, Li X, Stallaert J (2019) When More is Less: The Effect of Add-on Insurance on the Consumption of Professional Services"
 
 For all the authors' information, please see:
-[Xian Cao](https://www.bsu.edu/academics/collegesanddepartments/management/about-us/faculty-and-staff/caoxian)
-[Timothy Folta](https://www.business.uconn.edu/person/timothy-folta/)
-[Hongfei Li](https://hongfeiuconn.github.io/personal-website/)
-[Ruoqing Zhu](https://sites.google.com/site/teazrq/)
+[Hongfei Li](https://www.hongfei-business.com/)
+[Jing Peng](https://www.business.uconn.edu/person/timothy-folta/)
+[Xinxin Li](https://hongfeiuconn.github.io/personal-website/)
+[Jan Stallaert](https://sites.google.com/site/teazrq/)
 
 This paper is currently under review. For a detailed introduction to MultiSeqCCoA, please refer to <a href="MultiSeqCCoA.pptx#" class="download" title="MultiSeqCCoA.pptx">MultiSeqCCoA.pptx</a>.
 
 ## Import libraries
 
 * All data filter and rearrangement are based on package [data.table](https://cran.r-project.org/web/packages/data.table/data.table.pdf).
-* Anytime package is used for converting Unix time to real time.
+
 
 ```{r,  warning = FALSE}
-library(MultiSeqCCA)
+library(cem)
 library(data.table)
-library(anytime)
+library(MatchIt)
 ```
 
-## Read Data
+## Empirical Context
+Our context is one of the largest online platforms for cosmetic procedures in China. It allows customers to make appointments for a cosmetic procedure offered by a specific hospital online by paying a certain amount of deposit. Then the customer goes offline to pay the rest of the price and take the surgery. 
+
+The platform offers a complication insurance policy, which aims at compensating customers for surgical malpractice or post-treatment complications such as severe infection. However, this insurance policy is only available for a subset of procedures. We are interested in whether the insurance has any effect on the average sales of procedures.
 
 
+
+## Explore Data
+
+### Read Data
+```{r,  warning = FALSE}
+data = fread("data.csv")
+
+colnames(data)
+
+```
+
+
+### Description of Variables 
+
+```{r,  warning = FALSE}
+## Read data fastly
+description = fread("description.csv")
+## Description of Variables 
+library(knitr)
+kable(description, caption = "Description of Variables")
+
+```
+
+Here, AvgSales is the dependent (or outcome) variable and Insurance is the treatment variable. When Insurance equals to 0, it means this procedure is not offered the complication insurance option, 1 otherwise.
+
+### Motivation
+To answer the above question, one can first come up with simple linear regression.
+
+```{r,  warning = FALSE}
+## Simple linear regression
+slr_no_match = lm(AvgSales~Insurance, data = data) 
+## Output the regression results
+summary(slr_no_match)
+```
+
+From the above results, the effect of insurance is significantly positive. Next, we use multiple linear regression, which is more robust than simple linear regression.
+
+```{r,  warning = FALSE}
+## Multiple linear regression
+mlr_no_match = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, data = data) 
+## Output the regression results
+summary(mlr_no_match)
+```
+From the above results, the effect of insurance is not significant anymore after controlling for all the covariates.
+
+- Why do we want to use matching?
+
+
+## Propensity Score Matching
+
+### Compare the Mean
+
+```{r,  warning = FALSE}
+### Create blank data table
+ttest_table_before_match = data.table(varname =character(), t.value=numeric(),
+                         p.value = numeric(), mean_no_insurance = numeric(),
+                         mean_with_insurance = numeric(), diff = numeric())
+### T-test for all variables
+for (col in colnames(data)) {
+  if (col == "Insurance" | col == "ProcedureID") next
+  zz = t.test(get(col)~get("Insurance"),data = data)
+  tvalue = zz$statistic[[1]]
+  pvalue = zz$p.value
+  mean1 = zz$estimate[[1]]
+  mean2 = zz$estimate[[2]]
+  temp = ttest_table_before_match[,list(varname = col, t.value = tvalue,
+                           p.value = pvalue, mean_no_insurance = mean1,
+                           mean_with_insurance = mean2,
+                           diff = mean1 - mean2)]
+  ttest_table_before_match = rbind(temp,ttest_table_before_match)
+}
+
+kable(ttest_table_before_match, caption = "Compare the Mean of All Variables of Insured and Uninsured Procedures before Matching")
+
+```
+
+Notice, the p-value of most variables are smaller than .05, which means the characteristics of insured and uninsured procedures are mostly different. Next, let's use [MatchIt](https://cran.r-project.org/web/packages/MatchIt/MatchIt.pdf) package to perform propensity score matching. More details about this package please refer to the [JSS paper](https://imai.fas.harvard.edu/research/files/matchit.pdf).
+
+```{r,  warning = FALSE}
+psm = matchit(Insurance ~  ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit  + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase ,
+              data = data, method = "nearest",
+              ratio = 1, distance = 'logit', caliper = .05)
+
+## distance: This argument specifies the method used to estimate the distance measure. The default is logistic regression, "logit". A variety of other methods are available.
+## nearest: This means the matching method we use for PSM is nearest neighbor.
+## ratio: the number of control units to match to each treated unit (default = 1).
+## caliper: the number of standard deviations of the distance measure within which to draw control units (default = 0, no caliper matching). If a caliper is specified, a control unit within the caliper for a treated unit is randomly selected as the match for that treated unit. I
+```
+
+The above command will generate a list of results. If we want to see the matching results, we can use: 
+
+```{r,  warning = FALSE}
+psm_result = summary(psm)
+## The following shows the matching results.
+
+kable(as.table(psm_result$nn), caption = "Matching Results")
+```
+
+The above table means: 438 procedures out of uninsured procedures are matched with 438 procedures out of insured procedures. Since we used one-to-one matching, the numbers of matched insured and uninsured procedures are the same. For the unmatched procedures, we can directly remove them. Then we can use the rest of sample for further analysis.
+
+Here, we mainly focus on "weights", which is a dummy variable and means whether the procedure has been selected during the matching process. If a procedure's weight is 0, it means this procedure is in unmatched group.
 
 
 ```{r,  warning = FALSE}
-load("data.RData")
-summary(data)
+
+```
+To get the data after matching, we can run the following commands:
+
+```{r,  warning = FALSE}
+## First combine weights to the original data set
+data_psm = cbind(data, weights = psm$weights)
+## Next, let's remove all procedures that are removed by matching process
+data_psm = data_psm[!(weights == 0)]
 
 ```
 
+
+### Compare the Mean after Matching
+
+```{r,  warning = FALSE}
+### Create blank data table
+ttest_table_after_match = data.table(varname =character(), t.value=numeric(),
+                         p.value = numeric(), mean_no_insurance = numeric(),
+                         mean_with_insurance = numeric(), diff = numeric())
+### T-test for all variables
+for (col in colnames(data_psm[,-c("ProcedureID","weights")])) {
+  if (col == "Insurance") next
+  zz = t.test(get(col)~get("Insurance"),data = data_psm)
+  tvalue = zz$statistic[[1]]
+  pvalue = zz$p.value
+  mean1 = zz$estimate[[1]]
+  mean2 = zz$estimate[[2]]
+  temp = ttest_table_after_match[,list(varname = col, t.value = tvalue,
+                           p.value = pvalue, mean_no_insurance = mean1,
+                           mean_with_insurance = mean2,
+                           diff = mean1 - mean2)]
+  ttest_table_after_match = rbind(temp,ttest_table_after_match)
+}
+
+kable(ttest_table_after_match, caption = "Matching Results")
+
+```
+
+Notice, the p-value of most variables are larger than .05, which means the characteristics of insured and uninsured procedures are now balanced. Now let's use the new data for multiple regression.
+
+```{r,  warning = FALSE}
+## Multiple linear regression
+mlr_after_match = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, data = data_psm) 
+## Output the regression results
+summary(mlr_after_match)
+```
+The effect of insurance with the matched data shows a significant result under .05 significant level.
+
+
+## Coarsened Exact Matching
+
+Ideally, if there are exactly same two procedures, one is insured and the other is uninsured, comparing their average monthly sales will lead to a very precise estimation of the effect of insurance. However, it is almost impossible to find the exactly same two procedures. Let's simply use price as the only characteristic of procedures. Although it is difficult to find two procedures with exactly the same price, we may be able to find one insured procedure whose price is \$1,000 and the other uninsured procedure whose price is \$1,010. Their prices. If we coarsen the exact number of price to some intervals, for example, we define price less than \$500 as low price, \$500 to \$2,000 as medium price, above \$2000 as high price. Then, it will be much easier to find matched sample from insured and uninsured procedures. This is the basic rationale of coarsened exact matching.
+
+Coarsened exact matching allows us to coarsen each covariate automatically or mannually. 
+
+- Automatical Coarsening
+
+Without any priori knowledge, we can first try automatical coarsening. Several options are available such as "sturges". How to choose the appropriate option depends on the distribution of the variables. For example, sturges rule works well for normally distributed variable. Therefore, it is important to check the distributions of all continuous variables before matching. In our case, ProcedureAge, AvgCompNum, AvgReviews, PriceDeposit, PricePaid, and PriceOrigin are continuous variables. SurgeonNum is a categorical variable including five categories. The following histogram shows that most variables are highly right-skewed. 
+
+- Manual Coarsening
+
+In practice, manual coarsening is more reasonable. For example, if the range of price is from 100 to 100,000, it will be meaningless to coarsen 
+
+
+```{r,  warning = FALSE}
+library(ggplot2)
+ProcedureAgeHist <- ggplot(data, aes(x=ProcedureAge)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
+  xlab("ProcedureAge")
+
+AvgCompNumHist <- ggplot(data, aes(x=AvgCompNum)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
+  xlab("AvgCompNum")
+
+AvgReviewsHist <- ggplot(data, aes(x=AvgReviews)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
+  xlab("AvgReviews")
+
+PriceDepositHist <- ggplot(data, aes(x=PriceDeposit)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
+  xlab("PriceDeposit")
+
+PricePaidHist <- ggplot(data[PricePaid<150000], aes(x=PricePaid)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
+  xlab("PricePaid")
+
+PriceOriginHist <- ggplot(data, aes(x=PriceOrigin)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
+  xlab("PriceOrigin")
+
+SurgeonNumHist <- ggplot(data, aes(x=SurgeonNum)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
+  xlab("SurgeonNum")
+
+library(gridExtra)
+grid.arrange( ProcedureAgeHist, AvgCompNumHist,AvgReviewsHist,PriceDepositHist,PricePaidHist,PriceOriginHist,SurgeonNumHist, ncol=2)
+```
+
+ We can 
+
+
+
+Notice, there is no sense to coarsen dummy variables (i.e., binary variables) since they are already "coarsened" into two categories. We use 0.5 as the cut point to keep these dummy variables unchanged. You can also use any number strictly between 0 and 1 as the cut point.
 
 
 

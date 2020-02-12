@@ -1,0 +1,13 @@
+Variables,Description
+ProcedureAge,The number of months since a procedure was first available when the complication insurance was introduced
+AvgCompNum,Average monthly number of competitors
+AvgReviews,Average monthly number of reviews
+PriceDeposit,The amount of deposit for the procedure
+PricePaid,"The effective price for the procedure, net of discounts"
+PriceOrigin,The original price of the procedure
+SurgeonNum,The number of surgeons available for the procedure
+Public,Dummy. Whether this procedure is performed by a public hospital
+ReviewBonus,Dummy. Whether the provider offers a bonus for users to write reviews
+Ad,Dummy. Whether there is an ad on the webpage of this procedure
+Financing,Dummy. Whether this procedure supports financing
+GroupPurchase,Dummy. Whether this procedure supports group purchasing
