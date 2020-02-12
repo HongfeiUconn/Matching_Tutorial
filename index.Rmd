@@ -5,7 +5,7 @@ knit: (function(input_file, encoding) {
   rmarkdown::render(input_file,
  encoding=encoding,
  output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
-author: "[Hongfei Li](https://hongfei-business.com/)"
+author: "OPIM 5510 - Web Analytics, Instructor: [Xinxin Li](https://www.business.uconn.edu/person/xinxin-li/)"
 date: "Last Updated: `r format(Sys.time(), '%B %d, %Y')`"
 output: 
   rmarkdown::html_vignette:
@@ -25,17 +25,14 @@ knitr::opts_chunk$set(
 ```
 
 
-This tutorial uses an empirical example to describe matching strategy. The package was written by [Ruoqing Zhu](https://sites.google.com/site/teazrq/). The reference of the paper that put forward this package is recommended as 
+This tutorial uses an empirical example to describe matching strategies. The data source is used in a working paper written by:
 
-> "Li H, Peng J, Li X, Stallaert J (2019) When More is Less: The Effect of Add-on Insurance on the Consumption of Professional Services"
-
-For all the authors' information, please see:
 [Hongfei Li](https://www.hongfei-business.com/)
-[Jing Peng](https://www.business.uconn.edu/person/timothy-folta/)
-[Xinxin Li](https://hongfeiuconn.github.io/personal-website/)
-[Jan Stallaert](https://sites.google.com/site/teazrq/)
+[Jing Peng](https://www.business.uconn.edu/person/jing-peng/)
+[Xinxin Li](https://www.business.uconn.edu/person/xinxin-li/)
+[Jan Stallaert](https://www.business.uconn.edu/person/jan-stallaert/)
 
-This paper is currently under review. For a detailed introduction to MultiSeqCCoA, please refer to <a href="MultiSeqCCoA.pptx#" class="download" title="MultiSeqCCoA.pptx">MultiSeqCCoA.pptx</a>.
+All the data source and R codes can be found [here](https://github.com/HongfeiUconn/Matching_Tutorial).
 
 ## Import libraries
 
