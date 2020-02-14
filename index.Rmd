@@ -83,7 +83,8 @@ To answer the above question, one can first come up with simple linear regressio
 ## Simple linear regression
 slr_no_match = lm(AvgSales~Insurance, data = data) 
 ## Output the regression results
-summary(slr_no_match)
+
+kable(summary(slr_no_match)$coefficients, caption = "Simple Linear Regression without Matching")
 ```
 
 From the above results, the effect of insurance is significantly positive. Next, we use multiple linear regression, which is more robust than simple linear regression.
@@ -92,7 +93,7 @@ From the above results, the effect of insurance is significantly positive. Next,
 ## Multiple linear regression
 mlr_no_match = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, data = data) 
 ## Output the regression results
-summary(mlr_no_match)
+kable(summary(mlr_no_match)$coefficients, caption = "Multiple Linear Regression without Matching")
 ```
 From the above results, the effect of insurance is not significant anymore after controlling for all the covariates.
 
@@ -203,10 +204,11 @@ Notice, the p-value of most variables are larger than .05, which means the chara
 
 ```{r,  warning = FALSE}
 ## Multiple linear regression
-mlr_after_match = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, data = data_psm) 
+mlr_after_psm = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, data = data_psm) 
 ## Output the regression results
-summary(mlr_after_match)
+kable(summary(mlr_after_psm)$coefficients, caption = "Multiple Linear Regression after PSM Matching")
 ```
+
 The effect of insurance with the matched data shows a significant result under .05 significant level.
 
 
@@ -216,14 +218,30 @@ Ideally, if there are exactly same two procedures, one is insured and the other 
 
 Coarsened exact matching allows us to coarsen each covariate automatically or mannually. 
 
-- Automatical Coarsening
+### Automatical Coarsening
 
-Without any priori knowledge, we can first try automatical coarsening. Several options are available such as "sturges". How to choose the appropriate option depends on the distribution of the variables. For example, sturges rule works well for normally distributed variable. Therefore, it is important to check the distributions of all continuous variables before matching. In our case, ProcedureAge, AvgCompNum, AvgReviews, PriceDeposit, PricePaid, and PriceOrigin are continuous variables. SurgeonNum is a categorical variable including five categories. The following histogram shows that most variables are highly right-skewed. 
+Coarsened exact matching allows us to coarsen each covariate automatically or mannually. Without any priori knowledge, we can first try automatical coarsening. Several options are available such as "sturges". How to choose the appropriate option depends on the distribution of the variables. Notice, there is no sense to coarsen dummy variables (i.e., binary variables) since they are already "coarsened" into two categories. In our case, ProcedureAge, AvgCompNum, AvgReviews, PriceDeposit, PricePaid, and PriceOrigin are continuous variables. We use "sturges" option to coarsen these continuous variables. SurgeonNum is a categorical variable including five categories, we coarsen it into two categories: procedures that one or less physician is available, and procedures that multiple physicians are available. All the other variables are dummies, so we use 0.5 as the cut point to keep them unchanged. You can also use any number strictly between 0 and 1 as the cut point.
 
-- Manual Coarsening
+The following codes show how we coarsen each variable
 
-In practice, manual coarsening is more reasonable. For example, if the range of price is from 100 to 100,000, it will be meaningless to coarsen 
+```{r,  warning = FALSE}
+cut_auto = list(PriceDeposit = "sturges",PricePaid = "sturges", PriceOrigin = "sturges",ProcedureAge = "sturges", AvgCompNum = "sturges", SurgeonNum = c(1.5), AvgReviews = "sturges", Public = c(0.5), ReviewBonus = c(0.5),Ad = c(0.5),Financing = c(0.5),GroupPurchase = c(0.5))
+```
 
+We first check imbalance before matching.
+
+```{r,  warning = FALSE}
+imbalance(data$Insurance, data, drop=c("ProcedureID","AvgSales","Insurance"), breaks = cut_auto)
+```
+
+
+We next run CEM with automatical coarsening.
+
+```{r,  warning = FALSE}
+cem_auto <- cem(treatment = "Insurance", data = data, cutpoints = cut_auto, keep.all=TRUE,eval.imbalance = TRUE, drop = c("ProcedureID","AvgSales","Insurance"), L1.breaks = cut_auto )
+```
+
+How to choose the appropriate option for automatical coarsening depends on the distribution of the variables. For example, sturges rule works well for normally distributed variable. Therefore, it is important to check the distributions of all continuous variables before matching. The following histogram shows that most variables are highly right-skewed. Therefore, using "sturges" rule as the approach of automatical coarsening may not be a good choice.
 
 ```{r,  warning = FALSE, fig.height=6, fig.width=8}
 library(ggplot2)
@@ -252,11 +270,19 @@ library(gridExtra)
 grid.arrange( ProcedureAgeHist, AvgCompNumHist,AvgReviewsHist,PriceDepositHist,PricePaidHist,PriceOriginHist,SurgeonNumHist, ncol=3)
 ```
 
-Notice, there is no sense to coarsen dummy variables (i.e., binary variables) since they are already "coarsened" into two categories. We use 0.5 as the cut point to keep these dummy variables unchanged. You can also use any number strictly between 0 and 1 as the cut point.
 
+### Manual Coarsening
 
+In practice, manual coarsening is more reasonable. For example, if the range of price is from \$100 to \$100,00, we can separate this interval into three pieces with two cut points (e.g., \$499.5 and \$1999.5):
+
+ - \$100-\$500: low price 
+ - \$500-\$2000: medium price
+ - \$2000-\$100,00: high price
+ 
+Notice, how to coarsen a variable highly depends on priori knowledge. In this situation, consulting a physician could help a lot. The downside of it is that people may critisize the coarsening is very arbitrary and could be an "artifact" to make the matching result better than real. The following codes show how to define cut points with R and how to use manually defined coarsening for CEM.
 
 ```{r,  warning = FALSE}
+## Define cut points
 PriceDepositCut = c(99.5,999.5)
 PricePaidCut = c(999.5,4999.5,9999.5)
 PriceOriginCut = c(999.5,4999.5,9999.5)
@@ -265,20 +291,48 @@ AvgCompNumCut = 2
 SurgeonNumCut = c(0.5,1.5)
 AvgReviewsCut = 2
 
+## Save the cut points into a list
 cut_man = list(ProcedureAge = ProcedureAgeCut, AvgCompNum = AvgCompNumCut, AvgReviews = AvgReviewsCut, PriceDeposit = PriceDepositCut, PricePaid = PricePaidCut, PriceOrigin = PriceOriginCut,  SurgeonNum = SurgeonNumCut,Public = c(0.5), ReviewBonus = c(0.5),Ad = c(0.5),Financing = c(0.5),GroupPurchase = c(0.5))
 
 ```
 
-
+After defining the cut points, we can run CEM with the manual coarsening. We first check the imbalance of our data.
 
 ```{r,  warning = FALSE}
 ### Imbalance before matching
 imbalance(data$Insurance, data, drop=c("ProcedureID","AvgSales", "Insurance"), breaks = cut_man)
+```
 
+Next, we run the command for CEM.
+
+```{r,  warning = FALSE}
 ### CEM matching
 cem_man <- cem(treatment = "Insurance", data = data, keep.all=TRUE, eval.imbalance = TRUE, drop = c("ProcedureID","Insurance",  "AvgSales"),cutpoints = cut_man, L1.breaks = cut_man )
 
 ```
+
+
+### Use the results of CEM
+
+Here, we take the manual coarsening as example to show how to use the results of CEM. First, as what we did for PSM, we select the weight and combine it with the original data.
+
+```{r,  warning = FALSE}
+data_cem_man = cbind(data, weight = cem_man$w)
+
+summary(data_cem_man$weight)
+
+```
+
+Different from the results of PSM, the weights CEM generates is not just 0 or 1. To use the matching data from regression, we can run weighted regression such that:
+
+```{r,  warning = FALSE}
+mlr_after_cem = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, data = data_cem_man, weights = weight) 
+
+kable(summary(mlr_after_cem)$coefficients, caption = "Multiple Linear Regression after CEM Matching")
+
+```
+
+From the above results, the impact of insurance is positive under .01 significant level.
 
 ## Notes
 
