@@ -96,8 +96,13 @@ summary(mlr_no_match)
 ```
 From the above results, the effect of insurance is not significant anymore after controlling for all the covariates.
 
-- Why do we want to use matching?
+### Why do we want to use matching?
 
+Suppose in an ideal situation, one procedure is insured and uninsured at the same time, then if we take the difference of the average monthly sales under the insured and uninsured situations, we can get a precise measurement of the impact of the insurance policy. However, one procedure can either be insured or uninsured, but it can never be in these two situations simultaneously, unless we have a parallel universe (which is called “counterfactual” in the literature of causal inference). To solve this issue, we may have the following two options:
+
+- For each insured procedure, find an uninsured procedure which is exactly same with this insured procedure in terms of all characteristics such as the procedure type, price, hospital, number of reviews, etc. In this situation, although the two procedures are “two” procedures, they can still be treated as the same one since there are no difference between them except for whether they are insured, just like a comparison between twins. It can be shown that the bias of the estimation of the effect of insurance is designed to be 0 in this situation. Coarsened exact matching (CEM) refers to this idea.
+
+- For each insured procedure, suppose the probability of this procedure is chosen to the insured group is $p$, we need find an uninsured procedure whose probability of this procedure is chosen to the insured group is also $p$. For example, flipping a fair coin to randomly assign the procedures into the insured or uninsured group. This means each procedure is equally likely to be assigned the insurance policy with probability 0.5. You can also use random number or toll a die to assign the procedures into the insured and uninsured groups, as long as you can guarantee a pair of procedures have the same chance to be assigned with the insurance. But in real world, we cannot assign the insurance by ourselves because everything has already been determined by the company. The only data we can use is observational but not experimental. However, if we happen to find two procedures—one insured and the other one uninsured—with the same probability to be assigned the insurance, we can solve the problem! This is the basic idea of propensity score matching. Then comparing the difference between their average monthly sales is an unbiased estimator of the effect of the insurance policy. It can be shown that the expectation of the bias of the estimation of the effect of insurance is 0. When the sample size is large enough, the bias becomes very close to 0 by law of large number.
 
 ## Propensity Score Matching
 
@@ -207,7 +212,7 @@ The effect of insurance with the matched data shows a significant result under .
 
 ## Coarsened Exact Matching
 
-Ideally, if there are exactly same two procedures, one is insured and the other is uninsured, comparing their average monthly sales will lead to a very precise estimation of the effect of insurance. However, it is almost impossible to find the exactly same two procedures. Let's simply use price as the only characteristic of procedures. Although it is difficult to find two procedures with exactly the same price, we may be able to find one insured procedure whose price is \$1,000 and the other uninsured procedure whose price is \$1,010. Their prices. If we coarsen the exact number of price to some intervals, for example, we define price less than \$500 as low price, \$500 to \$2,000 as medium price, above \$2000 as high price. Then, it will be much easier to find matched sample from insured and uninsured procedures. This is the basic rationale of coarsened exact matching.
+Ideally, if there are exactly same two procedures, one is insured and the other is uninsured, comparing their average monthly sales will lead to a very precise estimate of the effect of insurance. However, it is almost impossible to find the exactly same two procedures. Let's simply use price as the only characteristic of procedures. Although it is difficult to find two procedures with exactly the same price, we may be able to find one insured procedure whose price is \$1,000 and the other uninsured procedure whose price is \$1,010. Their prices. If we coarsen the exact number of price to some intervals, for example, we define price less than \$500 as low price, \$500 to \$2,000 as medium price, above \$2000 as high price. Then, it will be much easier to find matched sample from insured and uninsured procedures. This is the basic rationale of coarsened exact matching.
 
 Coarsened exact matching allows us to coarsen each covariate automatically or mannually. 
 
@@ -220,7 +225,7 @@ Without any priori knowledge, we can first try automatical coarsening. Several o
 In practice, manual coarsening is more reasonable. For example, if the range of price is from 100 to 100,000, it will be meaningless to coarsen 
 
 
-```{r,  warning = FALSE}
+```{r,  warning = FALSE, fig.height=6, fig.width=8}
 library(ggplot2)
 ProcedureAgeHist <- ggplot(data, aes(x=ProcedureAge)) + geom_histogram(bins = 15, color="darkblue", fill="lightblue") + theme_bw() +
   xlab("ProcedureAge")
@@ -244,16 +249,44 @@ SurgeonNumHist <- ggplot(data, aes(x=SurgeonNum)) + geom_histogram(bins = 15, co
   xlab("SurgeonNum")
 
 library(gridExtra)
-grid.arrange( ProcedureAgeHist, AvgCompNumHist,AvgReviewsHist,PriceDepositHist,PricePaidHist,PriceOriginHist,SurgeonNumHist, ncol=2)
+grid.arrange( ProcedureAgeHist, AvgCompNumHist,AvgReviewsHist,PriceDepositHist,PricePaidHist,PriceOriginHist,SurgeonNumHist, ncol=3)
 ```
-
- We can 
-
-
 
 Notice, there is no sense to coarsen dummy variables (i.e., binary variables) since they are already "coarsened" into two categories. We use 0.5 as the cut point to keep these dummy variables unchanged. You can also use any number strictly between 0 and 1 as the cut point.
 
 
+
+```{r,  warning = FALSE}
+PriceDepositCut = c(99.5,999.5)
+PricePaidCut = c(999.5,4999.5,9999.5)
+PriceOriginCut = c(999.5,4999.5,9999.5)
+ProcedureAgeCut = 2
+AvgCompNumCut = 2
+SurgeonNumCut = c(0.5,1.5)
+AvgReviewsCut = 2
+
+cut_man = list(ProcedureAge = ProcedureAgeCut, AvgCompNum = AvgCompNumCut, AvgReviews = AvgReviewsCut, PriceDeposit = PriceDepositCut, PricePaid = PricePaidCut, PriceOrigin = PriceOriginCut,  SurgeonNum = SurgeonNumCut,Public = c(0.5), ReviewBonus = c(0.5),Ad = c(0.5),Financing = c(0.5),GroupPurchase = c(0.5))
+
+```
+
+
+
+```{r,  warning = FALSE}
+### Imbalance before matching
+imbalance(data$Insurance, data, drop=c("ProcedureID","AvgSales", "Insurance"), breaks = cut_man)
+
+### CEM matching
+cem_man <- cem(treatment = "Insurance", data = data, keep.all=TRUE, eval.imbalance = TRUE, drop = c("ProcedureID","Insurance",  "AvgSales"),cutpoints = cut_man, L1.breaks = cut_man )
+
+```
+
+## Notes
+
+- The above t-test is not strict enough since variables are not normally distributed and may also be not independent since two procedures from the same hospital could be correlated. One can use some non-parametric methods when assumptions do not hold such as Wilcoxon signed-rank test.
+
+- CEM dominates PSM and we recommend using CEM instead of PSM. The reason has been explained above: PSM tries to mimic random experiment whose expectation of bias is 0 but CEM tries mimic an experiment with exactly same paired subjects (which is called fully blocked randomized experiment) whose bias is designed to be 0. However, CEM needs us to have some priori knowledge about the covariates to coarsen them.
+
+- All the matching methods are based on observable covariates that exist in our dataset. If the assignment depends on unobservable confounders, there could still be bias after matching. Matching can help us reduce the unbalance between the treatment and control groups only based on observable characteristics.
 
 
 

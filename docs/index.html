@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
 
 <meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta name="author" content="OPIM 5510 - Web Analytics, Instructor: Xinxin Li" />
 
@@ -19,9 +19,9 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -31,14 +31,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -47,9 +49,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -95,7 +97,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -116,6 +118,9 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
+}
+#header {
+text-align: center;
 }
 #TOC {
 clear: both;
@@ -284,8 +289,7 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; } 
-code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -300,7 +304,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">A Tutorial to Matching</h1>
 <h4 class="author">OPIM 5510 - Web Analytics, Instructor: <a href="https://www.business.uconn.edu/person/xinxin-li/">Xinxin Li</a></h4>
-<h4 class="date">Last Updated: February 11, 2020</h4>
+<h4 class="date">Last Updated: February 13, 2020</h4>
 
 
 
@@ -312,13 +316,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li>All data filter and rearrangement are based on package <a href="https://cran.r-project.org/web/packages/data.table/data.table.pdf">data.table</a>.</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(cem)</a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="co">#&gt; Loading required package: tcltk</span></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="co">#&gt; Loading required package: lattice</span></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="co">#&gt; How to use CEM? Type vignette(&quot;cem&quot;)</span></a>
-<a class="sourceLine" id="cb1-6" title="6"><span class="kw">library</span>(data.table)</a>
-<a class="sourceLine" id="cb1-7" title="7"><span class="kw">library</span>(MatchIt)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(cem)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; Loading required package: tcltk</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; Loading required package: lattice</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt; </span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt; How to use CEM? Type vignette(&quot;cem&quot;)</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="kw">library</span>(data.table)</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="kw">library</span>(MatchIt)</span></code></pre></div>
 </div>
 <div id="empirical-context" class="section level2">
 <h2>Empirical Context</h2>
@@ -329,21 +333,21 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>Explore Data</h2>
 <div id="read-data" class="section level3">
 <h3>Read Data</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">data =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;data.csv&quot;</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2"></a>
-<a class="sourceLine" id="cb2-3" title="3"><span class="kw">colnames</span>(data)</a>
-<a class="sourceLine" id="cb2-4" title="4"><span class="co">#&gt;  [1] &quot;ProcedureID&quot;   &quot;ProcedureAge&quot;  &quot;AvgCompNum&quot;    &quot;AvgReviews&quot;   </span></a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="co">#&gt;  [5] &quot;PriceDeposit&quot;  &quot;PricePaid&quot;     &quot;PriceOrigin&quot;   &quot;Public&quot;       </span></a>
-<a class="sourceLine" id="cb2-6" title="6"><span class="co">#&gt;  [9] &quot;SurgeonNum&quot;    &quot;ReviewBonus&quot;   &quot;Ad&quot;            &quot;Financing&quot;    </span></a>
-<a class="sourceLine" id="cb2-7" title="7"><span class="co">#&gt; [13] &quot;GroupPurchase&quot; &quot;Insurance&quot;     &quot;AvgSales&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>data =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;data.csv&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">colnames</span>(data)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt;  [1] &quot;ProcedureID&quot;   &quot;ProcedureAge&quot;  &quot;AvgCompNum&quot;    &quot;AvgReviews&quot;   </span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt;  [5] &quot;PriceDeposit&quot;  &quot;PricePaid&quot;     &quot;PriceOrigin&quot;   &quot;Public&quot;       </span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;  [9] &quot;SurgeonNum&quot;    &quot;ReviewBonus&quot;   &quot;Ad&quot;            &quot;Financing&quot;    </span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; [13] &quot;GroupPurchase&quot; &quot;Insurance&quot;     &quot;AvgSales&quot;</span></span></code></pre></div>
 </div>
 <div id="description-of-variables" class="section level3">
 <h3>Description of Variables</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co">## Read data fastly</span></a>
-<a class="sourceLine" id="cb3-2" title="2">description =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;description.csv&quot;</span>)</a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="co">## Description of Variables </span></a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="kw">library</span>(knitr)</a>
-<a class="sourceLine" id="cb3-5" title="5"><span class="kw">kable</span>(description, <span class="dt">caption =</span> <span class="st">&quot;Description of Variables&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">## Read data fastly</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>description =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;description.csv&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">## Description of Variables </span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="kw">kable</span>(description, <span class="dt">caption =</span> <span class="st">&quot;Description of Variables&quot;</span>)</span></code></pre></div>
 <table>
 <caption>Description of Variables</caption>
 <thead>
@@ -408,69 +412,74 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="motivation" class="section level3">
 <h3>Motivation</h3>
 <p>To answer the above question, one can first come up with simple linear regression.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co">## Simple linear regression</span></a>
-<a class="sourceLine" id="cb4-2" title="2">slr_no_match =<span class="st"> </span><span class="kw">lm</span>(AvgSales<span class="op">~</span>Insurance, <span class="dt">data =</span> data) </a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="co">## Output the regression results</span></a>
-<a class="sourceLine" id="cb4-4" title="4"><span class="kw">summary</span>(slr_no_match)</a>
-<a class="sourceLine" id="cb4-5" title="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-6" title="6"><span class="co">#&gt; Call:</span></a>
-<a class="sourceLine" id="cb4-7" title="7"><span class="co">#&gt; lm(formula = AvgSales ~ Insurance, data = data)</span></a>
-<a class="sourceLine" id="cb4-8" title="8"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-9" title="9"><span class="co">#&gt; Residuals:</span></a>
-<a class="sourceLine" id="cb4-10" title="10"><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></a>
-<a class="sourceLine" id="cb4-11" title="11"><span class="co">#&gt; -3.542 -2.685 -1.586 -0.296 99.818 </span></a>
-<a class="sourceLine" id="cb4-12" title="12"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-13" title="13"><span class="co">#&gt; Coefficients:</span></a>
-<a class="sourceLine" id="cb4-14" title="14"><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></a>
-<a class="sourceLine" id="cb4-15" title="15"><span class="co">#&gt; (Intercept)    1.746      0.250   6.983 4.57e-12 ***</span></a>
-<a class="sourceLine" id="cb4-16" title="16"><span class="co">#&gt; Insurance      1.797      0.360   4.991 6.81e-07 ***</span></a>
-<a class="sourceLine" id="cb4-17" title="17"><span class="co">#&gt; ---</span></a>
-<a class="sourceLine" id="cb4-18" title="18"><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></a>
-<a class="sourceLine" id="cb4-19" title="19"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-20" title="20"><span class="co">#&gt; Residual standard error: 6.538 on 1319 degrees of freedom</span></a>
-<a class="sourceLine" id="cb4-21" title="21"><span class="co">#&gt; Multiple R-squared:  0.01853,    Adjusted R-squared:  0.01779 </span></a>
-<a class="sourceLine" id="cb4-22" title="22"><span class="co">#&gt; F-statistic: 24.91 on 1 and 1319 DF,  p-value: 6.813e-07</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">## Simple linear regression</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>slr_no_match =<span class="st"> </span><span class="kw">lm</span>(AvgSales<span class="op">~</span>Insurance, <span class="dt">data =</span> data) </span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">## Output the regression results</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="kw">summary</span>(slr_no_match)</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt; </span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; lm(formula = AvgSales ~ Insurance, data = data)</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; </span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; -3.542 -2.685 -1.586 -0.296 99.818 </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; </span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; (Intercept)    1.746      0.250   6.983 4.57e-12 ***</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; Insurance      1.797      0.360   4.991 6.81e-07 ***</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; ---</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; </span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; Residual standard error: 6.538 on 1319 degrees of freedom</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; Multiple R-squared:  0.01853,    Adjusted R-squared:  0.01779 </span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; F-statistic: 24.91 on 1 and 1319 DF,  p-value: 6.813e-07</span></span></code></pre></div>
 <p>From the above results, the effect of insurance is significantly positive. Next, we use multiple linear regression, which is more robust than simple linear regression.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co">## Multiple linear regression</span></a>
-<a class="sourceLine" id="cb5-2" title="2">mlr_no_match =<span class="st"> </span><span class="kw">lm</span>(AvgSales<span class="op">~</span>Insurance <span class="op">+</span><span class="st"> </span>ProcedureAge <span class="op">+</span><span class="st"> </span>AvgCompNum <span class="op">+</span><span class="st"> </span>AvgReviews <span class="op">+</span><span class="st"> </span>PriceDeposit <span class="op">+</span><span class="st"> </span>PricePaid <span class="op">+</span><span class="st"> </span>PriceOrigin <span class="op">+</span><span class="st"> </span>Public <span class="op">+</span><span class="st"> </span>SurgeonNum <span class="op">+</span><span class="st"> </span>ReviewBonus <span class="op">+</span><span class="st"> </span>Ad <span class="op">+</span><span class="st"> </span>Financing <span class="op">+</span><span class="st"> </span>GroupPurchase, <span class="dt">data =</span> data) </a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="co">## Output the regression results</span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="kw">summary</span>(mlr_no_match)</a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="co">#&gt; Call:</span></a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="co">#&gt; lm(formula = AvgSales ~ Insurance + ProcedureAge + AvgCompNum + </span></a>
-<a class="sourceLine" id="cb5-8" title="8"><span class="co">#&gt;     AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + </span></a>
-<a class="sourceLine" id="cb5-9" title="9"><span class="co">#&gt;     SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, </span></a>
-<a class="sourceLine" id="cb5-10" title="10"><span class="co">#&gt;     data = data)</span></a>
-<a class="sourceLine" id="cb5-11" title="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb5-12" title="12"><span class="co">#&gt; Residuals:</span></a>
-<a class="sourceLine" id="cb5-13" title="13"><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></a>
-<a class="sourceLine" id="cb5-14" title="14"><span class="co">#&gt; -37.216  -2.178  -0.852   0.639  90.460 </span></a>
-<a class="sourceLine" id="cb5-15" title="15"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb5-16" title="16"><span class="co">#&gt; Coefficients:</span></a>
-<a class="sourceLine" id="cb5-17" title="17"><span class="co">#&gt;                 Estimate Std. Error t value Pr(&gt;|t|)    </span></a>
-<a class="sourceLine" id="cb5-18" title="18"><span class="co">#&gt; (Intercept)   -3.290e-01  5.732e-01  -0.574  0.56603    </span></a>
-<a class="sourceLine" id="cb5-19" title="19"><span class="co">#&gt; Insurance      5.401e-01  3.676e-01   1.469  0.14202    </span></a>
-<a class="sourceLine" id="cb5-20" title="20"><span class="co">#&gt; ProcedureAge  -3.821e-02  3.462e-02  -1.104  0.26987    </span></a>
-<a class="sourceLine" id="cb5-21" title="21"><span class="co">#&gt; AvgCompNum     2.528e-01  4.330e-02   5.838 6.67e-09 ***</span></a>
-<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; AvgReviews     2.742e+00  2.253e-01  12.173  &lt; 2e-16 ***</span></a>
-<a class="sourceLine" id="cb5-23" title="23"><span class="co">#&gt; PriceDeposit  -6.512e-04  2.178e-04  -2.990  0.00284 ** </span></a>
-<a class="sourceLine" id="cb5-24" title="24"><span class="co">#&gt; PricePaid      8.307e-06  3.305e-05   0.251  0.80157    </span></a>
-<a class="sourceLine" id="cb5-25" title="25"><span class="co">#&gt; PriceOrigin    7.433e-06  1.872e-05   0.397  0.69138    </span></a>
-<a class="sourceLine" id="cb5-26" title="26"><span class="co">#&gt; Public         2.345e-02  7.857e-01   0.030  0.97619    </span></a>
-<a class="sourceLine" id="cb5-27" title="27"><span class="co">#&gt; SurgeonNum     2.500e-01  3.052e-01   0.819  0.41291    </span></a>
-<a class="sourceLine" id="cb5-28" title="28"><span class="co">#&gt; ReviewBonus   -6.197e-01  3.490e+00  -0.178  0.85911    </span></a>
-<a class="sourceLine" id="cb5-29" title="29"><span class="co">#&gt; Ad             8.924e-01  6.152e-01   1.451  0.14713    </span></a>
-<a class="sourceLine" id="cb5-30" title="30"><span class="co">#&gt; Financing      1.251e+00  4.258e-01   2.937  0.00337 ** </span></a>
-<a class="sourceLine" id="cb5-31" title="31"><span class="co">#&gt; GroupPurchase  1.301e+00  5.307e-01   2.452  0.01435 *  </span></a>
-<a class="sourceLine" id="cb5-32" title="32"><span class="co">#&gt; ---</span></a>
-<a class="sourceLine" id="cb5-33" title="33"><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></a>
-<a class="sourceLine" id="cb5-34" title="34"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb5-35" title="35"><span class="co">#&gt; Residual standard error: 6.005 on 1307 degrees of freedom</span></a>
-<a class="sourceLine" id="cb5-36" title="36"><span class="co">#&gt; Multiple R-squared:  0.1796, Adjusted R-squared:  0.1714 </span></a>
-<a class="sourceLine" id="cb5-37" title="37"><span class="co">#&gt; F-statistic:    22 on 13 and 1307 DF,  p-value: &lt; 2.2e-16</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">## Multiple linear regression</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>mlr_no_match =<span class="st"> </span><span class="kw">lm</span>(AvgSales<span class="op">~</span>Insurance <span class="op">+</span><span class="st"> </span>ProcedureAge <span class="op">+</span><span class="st"> </span>AvgCompNum <span class="op">+</span><span class="st"> </span>AvgReviews <span class="op">+</span><span class="st"> </span>PriceDeposit <span class="op">+</span><span class="st"> </span>PricePaid <span class="op">+</span><span class="st"> </span>PriceOrigin <span class="op">+</span><span class="st"> </span>Public <span class="op">+</span><span class="st"> </span>SurgeonNum <span class="op">+</span><span class="st"> </span>ReviewBonus <span class="op">+</span><span class="st"> </span>Ad <span class="op">+</span><span class="st"> </span>Financing <span class="op">+</span><span class="st"> </span>GroupPurchase, <span class="dt">data =</span> data) </span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">## Output the regression results</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="kw">summary</span>(mlr_no_match)</span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; lm(formula = AvgSales ~ Insurance + ProcedureAge + AvgCompNum + </span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt;     AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + </span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt;     SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, </span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt;     data = data)</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt; -37.216  -2.178  -0.852   0.639  90.460 </span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt; </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt;                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; (Intercept)   -3.290e-01  5.732e-01  -0.574  0.56603    </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; Insurance      5.401e-01  3.676e-01   1.469  0.14202    </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; ProcedureAge  -3.821e-02  3.462e-02  -1.104  0.26987    </span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; AvgCompNum     2.528e-01  4.330e-02   5.838 6.67e-09 ***</span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; AvgReviews     2.742e+00  2.253e-01  12.173  &lt; 2e-16 ***</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; PriceDeposit  -6.512e-04  2.178e-04  -2.990  0.00284 ** </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; PricePaid      8.307e-06  3.305e-05   0.251  0.80157    </span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; PriceOrigin    7.433e-06  1.872e-05   0.397  0.69138    </span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; Public         2.345e-02  7.857e-01   0.030  0.97619    </span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt; SurgeonNum     2.500e-01  3.052e-01   0.819  0.41291    </span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt; ReviewBonus   -6.197e-01  3.490e+00  -0.178  0.85911    </span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt; Ad             8.924e-01  6.152e-01   1.451  0.14713    </span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt; Financing      1.251e+00  4.258e-01   2.937  0.00337 ** </span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt; GroupPurchase  1.301e+00  5.307e-01   2.452  0.01435 *  </span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt; ---</span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt; </span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt; Residual standard error: 6.005 on 1307 degrees of freedom</span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt; Multiple R-squared:  0.1796, Adjusted R-squared:  0.1714 </span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt; F-statistic:    22 on 13 and 1307 DF,  p-value: &lt; 2.2e-16</span></span></code></pre></div>
 <p>From the above results, the effect of insurance is not significant anymore after controlling for all the covariates.</p>
+</div>
+<div id="why-do-we-want-to-use-matching" class="section level3">
+<h3>Why do we want to use matching?</h3>
+<p>Suppose in an ideal situation, one procedure is insured and uninsured at the same time, then if we take the difference of the average monthly sales under the insured and uninsured situations, we can get a precise measurement of the impact of the insurance policy. However, one procedure can either be insured or uninsured, but it can never be in these two situations simultaneously, unless we have a parallel universe (which is called “counterfactual” in the literature of causal inference). To solve this issue, we may have the following two options:</p>
 <ul>
-<li>Why do we want to use matching?</li>
+<li><p>For each insured procedure, find an uninsured procedure which is exactly same with this insured procedure in terms of all characteristics such as the procedure type, price, hospital, number of reviews, etc. In this situation, although the two procedures are “two” procedures, they can still be treated as the same one since there are no difference between them except for whether they are insured, just like a comparison between twins. It can be shown that the bias of the estimation of the effect of insurance is designed to be 0 in this situation. Coarsened exact matching (CEM) refers to this idea.</p></li>
+<li><p>For each insured procedure, suppose the probability of this procedure is chosen to the insured group is <span class="math inline">\(p\)</span>, we need find an uninsured procedure whose probability of this procedure is chosen to the insured group is also <span class="math inline">\(p\)</span>. For example, flipping a fair coin to randomly assign the procedures into the insured or uninsured group. This means each procedure is equally likely to be assigned the insurance policy with probability 0.5. You can also use random number or toll a die to assign the procedures into the insured and uninsured groups, as long as you can guarantee a pair of procedures have the same chance to be assigned with the insurance. But in real world, we cannot assign the insurance by ourselves because everything has already been determined by the company. The only data we can use is observational but not experimental. However, if we happen to find two procedures—one insured and the other one uninsured—with the same probability to be assigned the insurance, we can solve the problem! This is the basic idea of propensity score matching. Then comparing the difference between their average monthly sales is an unbiased estimator of the effect of the insurance policy. It can be shown that the expectation of the bias of the estimation of the effect of insurance is 0. When the sample size is large enough, the bias becomes very close to 0 by law of large number.</p></li>
 </ul>
 </div>
 </div>
@@ -478,26 +487,26 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>Propensity Score Matching</h2>
 <div id="compare-the-mean" class="section level3">
 <h3>Compare the Mean</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co">### Create blank data table</span></a>
-<a class="sourceLine" id="cb6-2" title="2">ttest_table_before_match =<span class="st"> </span><span class="kw">data.table</span>(<span class="dt">varname =</span><span class="kw">character</span>(), <span class="dt">t.value=</span><span class="kw">numeric</span>(),</a>
-<a class="sourceLine" id="cb6-3" title="3">                         <span class="dt">p.value =</span> <span class="kw">numeric</span>(), <span class="dt">mean_no_insurance =</span> <span class="kw">numeric</span>(),</a>
-<a class="sourceLine" id="cb6-4" title="4">                         <span class="dt">mean_with_insurance =</span> <span class="kw">numeric</span>(), <span class="dt">diff =</span> <span class="kw">numeric</span>())</a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="co">### T-test for all variables</span></a>
-<a class="sourceLine" id="cb6-6" title="6"><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(data)) {</a>
-<a class="sourceLine" id="cb6-7" title="7">  <span class="cf">if</span> (col <span class="op">==</span><span class="st"> &quot;Insurance&quot;</span> <span class="op">|</span><span class="st"> </span>col <span class="op">==</span><span class="st"> &quot;ProcedureID&quot;</span>) <span class="cf">next</span></a>
-<a class="sourceLine" id="cb6-8" title="8">  zz =<span class="st"> </span><span class="kw">t.test</span>(<span class="kw">get</span>(col)<span class="op">~</span><span class="kw">get</span>(<span class="st">&quot;Insurance&quot;</span>),<span class="dt">data =</span> data)</a>
-<a class="sourceLine" id="cb6-9" title="9">  tvalue =<span class="st"> </span>zz<span class="op">$</span>statistic[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb6-10" title="10">  pvalue =<span class="st"> </span>zz<span class="op">$</span>p.value</a>
-<a class="sourceLine" id="cb6-11" title="11">  mean1 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb6-12" title="12">  mean2 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">2</span>]]</a>
-<a class="sourceLine" id="cb6-13" title="13">  temp =<span class="st"> </span>ttest_table_before_match[,<span class="kw">list</span>(<span class="dt">varname =</span> col, <span class="dt">t.value =</span> tvalue,</a>
-<a class="sourceLine" id="cb6-14" title="14">                           <span class="dt">p.value =</span> pvalue, <span class="dt">mean_no_insurance =</span> mean1,</a>
-<a class="sourceLine" id="cb6-15" title="15">                           <span class="dt">mean_with_insurance =</span> mean2,</a>
-<a class="sourceLine" id="cb6-16" title="16">                           <span class="dt">diff =</span> mean1 <span class="op">-</span><span class="st"> </span>mean2)]</a>
-<a class="sourceLine" id="cb6-17" title="17">  ttest_table_before_match =<span class="st"> </span><span class="kw">rbind</span>(temp,ttest_table_before_match)</a>
-<a class="sourceLine" id="cb6-18" title="18">}</a>
-<a class="sourceLine" id="cb6-19" title="19"></a>
-<a class="sourceLine" id="cb6-20" title="20"><span class="kw">kable</span>(ttest_table_before_match, <span class="dt">caption =</span> <span class="st">&quot;Compare the Mean of All Variables of Insured and Uninsured Procedures before Matching&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">### Create blank data table</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>ttest_table_before_match =<span class="st"> </span><span class="kw">data.table</span>(<span class="dt">varname =</span><span class="kw">character</span>(), <span class="dt">t.value=</span><span class="kw">numeric</span>(),</span>
+<span id="cb6-3"><a href="#cb6-3"></a>                         <span class="dt">p.value =</span> <span class="kw">numeric</span>(), <span class="dt">mean_no_insurance =</span> <span class="kw">numeric</span>(),</span>
+<span id="cb6-4"><a href="#cb6-4"></a>                         <span class="dt">mean_with_insurance =</span> <span class="kw">numeric</span>(), <span class="dt">diff =</span> <span class="kw">numeric</span>())</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">### T-test for all variables</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(data)) {</span>
+<span id="cb6-7"><a href="#cb6-7"></a>  <span class="cf">if</span> (col <span class="op">==</span><span class="st"> &quot;Insurance&quot;</span> <span class="op">|</span><span class="st"> </span>col <span class="op">==</span><span class="st"> &quot;ProcedureID&quot;</span>) <span class="cf">next</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>  zz =<span class="st"> </span><span class="kw">t.test</span>(<span class="kw">get</span>(col)<span class="op">~</span><span class="kw">get</span>(<span class="st">&quot;Insurance&quot;</span>),<span class="dt">data =</span> data)</span>
+<span id="cb6-9"><a href="#cb6-9"></a>  tvalue =<span class="st"> </span>zz<span class="op">$</span>statistic[[<span class="dv">1</span>]]</span>
+<span id="cb6-10"><a href="#cb6-10"></a>  pvalue =<span class="st"> </span>zz<span class="op">$</span>p.value</span>
+<span id="cb6-11"><a href="#cb6-11"></a>  mean1 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">1</span>]]</span>
+<span id="cb6-12"><a href="#cb6-12"></a>  mean2 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">2</span>]]</span>
+<span id="cb6-13"><a href="#cb6-13"></a>  temp =<span class="st"> </span>ttest_table_before_match[,<span class="kw">list</span>(<span class="dt">varname =</span> col, <span class="dt">t.value =</span> tvalue,</span>
+<span id="cb6-14"><a href="#cb6-14"></a>                           <span class="dt">p.value =</span> pvalue, <span class="dt">mean_no_insurance =</span> mean1,</span>
+<span id="cb6-15"><a href="#cb6-15"></a>                           <span class="dt">mean_with_insurance =</span> mean2,</span>
+<span id="cb6-16"><a href="#cb6-16"></a>                           <span class="dt">diff =</span> mean1 <span class="op">-</span><span class="st"> </span>mean2)]</span>
+<span id="cb6-17"><a href="#cb6-17"></a>  ttest_table_before_match =<span class="st"> </span><span class="kw">rbind</span>(temp,ttest_table_before_match)</span>
+<span id="cb6-18"><a href="#cb6-18"></a>}</span>
+<span id="cb6-19"><a href="#cb6-19"></a></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="kw">kable</span>(ttest_table_before_match, <span class="dt">caption =</span> <span class="st">&quot;Compare the Mean of All Variables of Insured and Uninsured Procedures before Matching&quot;</span>)</span></code></pre></div>
 <table>
 <caption>Compare the Mean of All Variables of Insured and Uninsured Procedures before Matching</caption>
 <thead>
@@ -618,19 +627,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>Notice, the p-value of most variables are smaller than .05, which means the characteristics of insured and uninsured procedures are mostly different. Next, let’s use <a href="https://cran.r-project.org/web/packages/MatchIt/MatchIt.pdf">MatchIt</a> package to perform propensity score matching. More details about this package please refer to the <a href="https://imai.fas.harvard.edu/research/files/matchit.pdf">JSS paper</a>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">psm =<span class="st"> </span><span class="kw">matchit</span>(Insurance <span class="op">~</span><span class="st">  </span>ProcedureAge <span class="op">+</span><span class="st"> </span>AvgCompNum <span class="op">+</span><span class="st"> </span>AvgReviews <span class="op">+</span><span class="st"> </span>PriceDeposit  <span class="op">+</span><span class="st"> </span>PricePaid <span class="op">+</span><span class="st"> </span>PriceOrigin <span class="op">+</span><span class="st"> </span>Public <span class="op">+</span><span class="st"> </span>SurgeonNum <span class="op">+</span><span class="st"> </span>ReviewBonus <span class="op">+</span><span class="st"> </span>Ad <span class="op">+</span><span class="st"> </span>Financing <span class="op">+</span><span class="st"> </span>GroupPurchase ,</a>
-<a class="sourceLine" id="cb7-2" title="2">              <span class="dt">data =</span> data, <span class="dt">method =</span> <span class="st">&quot;nearest&quot;</span>,</a>
-<a class="sourceLine" id="cb7-3" title="3">              <span class="dt">ratio =</span> <span class="dv">1</span>, <span class="dt">distance =</span> <span class="st">&#39;logit&#39;</span>, <span class="dt">caliper =</span> <span class="fl">.05</span>)</a>
-<a class="sourceLine" id="cb7-4" title="4"></a>
-<a class="sourceLine" id="cb7-5" title="5"><span class="co">## distance: This argument specifies the method used to estimate the distance measure. The default is logistic regression, &quot;logit&quot;. A variety of other methods are available.</span></a>
-<a class="sourceLine" id="cb7-6" title="6"><span class="co">## nearest: This means the matching method we use for PSM is nearest neighbor.</span></a>
-<a class="sourceLine" id="cb7-7" title="7"><span class="co">## ratio: the number of control units to match to each treated unit (default = 1).</span></a>
-<a class="sourceLine" id="cb7-8" title="8"><span class="co">## caliper: the number of standard deviations of the distance measure within which to draw control units (default = 0, no caliper matching). If a caliper is specified, a control unit within the caliper for a treated unit is randomly selected as the match for that treated unit. I</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>psm =<span class="st"> </span><span class="kw">matchit</span>(Insurance <span class="op">~</span><span class="st">  </span>ProcedureAge <span class="op">+</span><span class="st"> </span>AvgCompNum <span class="op">+</span><span class="st"> </span>AvgReviews <span class="op">+</span><span class="st"> </span>PriceDeposit  <span class="op">+</span><span class="st"> </span>PricePaid <span class="op">+</span><span class="st"> </span>PriceOrigin <span class="op">+</span><span class="st"> </span>Public <span class="op">+</span><span class="st"> </span>SurgeonNum <span class="op">+</span><span class="st"> </span>ReviewBonus <span class="op">+</span><span class="st"> </span>Ad <span class="op">+</span><span class="st"> </span>Financing <span class="op">+</span><span class="st"> </span>GroupPurchase ,</span>
+<span id="cb7-2"><a href="#cb7-2"></a>              <span class="dt">data =</span> data, <span class="dt">method =</span> <span class="st">&quot;nearest&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3"></a>              <span class="dt">ratio =</span> <span class="dv">1</span>, <span class="dt">distance =</span> <span class="st">&#39;logit&#39;</span>, <span class="dt">caliper =</span> <span class="fl">.05</span>)</span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">## distance: This argument specifies the method used to estimate the distance measure. The default is logistic regression, &quot;logit&quot;. A variety of other methods are available.</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">## nearest: This means the matching method we use for PSM is nearest neighbor.</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">## ratio: the number of control units to match to each treated unit (default = 1).</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">## caliper: the number of standard deviations of the distance measure within which to draw control units (default = 0, no caliper matching). If a caliper is specified, a control unit within the caliper for a treated unit is randomly selected as the match for that treated unit. I</span></span></code></pre></div>
 <p>The above command will generate a list of results. If we want to see the matching results, we can use:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">psm_result =<span class="st"> </span><span class="kw">summary</span>(psm)</a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="co">## The following shows the matching results.</span></a>
-<a class="sourceLine" id="cb8-3" title="3"></a>
-<a class="sourceLine" id="cb8-4" title="4"><span class="kw">kable</span>(<span class="kw">as.table</span>(psm_result<span class="op">$</span>nn), <span class="dt">caption =</span> <span class="st">&quot;Matching Results&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>psm_result =<span class="st"> </span><span class="kw">summary</span>(psm)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co">## The following shows the matching results.</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="kw">kable</span>(<span class="kw">as.table</span>(psm_result<span class="op">$</span>nn), <span class="dt">caption =</span> <span class="st">&quot;Matching Results&quot;</span>)</span></code></pre></div>
 <table>
 <caption>Matching Results</caption>
 <thead>
@@ -666,33 +675,33 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The above table means: 438 procedures out of uninsured procedures are matched with 438 procedures out of insured procedures. Since we used one-to-one matching, the numbers of matched insured and uninsured procedures are the same. For the unmatched procedures, we can directly remove them. Then we can use the rest of sample for further analysis.</p>
 <p>Here, we mainly focus on “weights”, which is a dummy variable and means whether the procedure has been selected during the matching process. If a procedure’s weight is 0, it means this procedure is in unmatched group.</p>
 <p>To get the data after matching, we can run the following commands:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co">## First combine weights to the original data set</span></a>
-<a class="sourceLine" id="cb9-2" title="2">data_psm =<span class="st"> </span><span class="kw">cbind</span>(data, <span class="dt">weights =</span> psm<span class="op">$</span>weights)</a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="co">## Next, let&#39;s remove all procedures that are removed by matching process</span></a>
-<a class="sourceLine" id="cb9-4" title="4">data_psm =<span class="st"> </span>data_psm[<span class="op">!</span>(weights <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)]</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">## First combine weights to the original data set</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>data_psm =<span class="st"> </span><span class="kw">cbind</span>(data, <span class="dt">weights =</span> psm<span class="op">$</span>weights)</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co">## Next, let&#39;s remove all procedures that are removed by matching process</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>data_psm =<span class="st"> </span>data_psm[<span class="op">!</span>(weights <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)]</span></code></pre></div>
 </div>
 <div id="compare-the-mean-after-matching" class="section level3">
 <h3>Compare the Mean after Matching</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co">### Create blank data table</span></a>
-<a class="sourceLine" id="cb10-2" title="2">ttest_table_after_match =<span class="st"> </span><span class="kw">data.table</span>(<span class="dt">varname =</span><span class="kw">character</span>(), <span class="dt">t.value=</span><span class="kw">numeric</span>(),</a>
-<a class="sourceLine" id="cb10-3" title="3">                         <span class="dt">p.value =</span> <span class="kw">numeric</span>(), <span class="dt">mean_no_insurance =</span> <span class="kw">numeric</span>(),</a>
-<a class="sourceLine" id="cb10-4" title="4">                         <span class="dt">mean_with_insurance =</span> <span class="kw">numeric</span>(), <span class="dt">diff =</span> <span class="kw">numeric</span>())</a>
-<a class="sourceLine" id="cb10-5" title="5"><span class="co">### T-test for all variables</span></a>
-<a class="sourceLine" id="cb10-6" title="6"><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(data_psm[,<span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;ProcedureID&quot;</span>,<span class="st">&quot;weights&quot;</span>)])) {</a>
-<a class="sourceLine" id="cb10-7" title="7">  <span class="cf">if</span> (col <span class="op">==</span><span class="st"> &quot;Insurance&quot;</span>) <span class="cf">next</span></a>
-<a class="sourceLine" id="cb10-8" title="8">  zz =<span class="st"> </span><span class="kw">t.test</span>(<span class="kw">get</span>(col)<span class="op">~</span><span class="kw">get</span>(<span class="st">&quot;Insurance&quot;</span>),<span class="dt">data =</span> data_psm)</a>
-<a class="sourceLine" id="cb10-9" title="9">  tvalue =<span class="st"> </span>zz<span class="op">$</span>statistic[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb10-10" title="10">  pvalue =<span class="st"> </span>zz<span class="op">$</span>p.value</a>
-<a class="sourceLine" id="cb10-11" title="11">  mean1 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb10-12" title="12">  mean2 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">2</span>]]</a>
-<a class="sourceLine" id="cb10-13" title="13">  temp =<span class="st"> </span>ttest_table_after_match[,<span class="kw">list</span>(<span class="dt">varname =</span> col, <span class="dt">t.value =</span> tvalue,</a>
-<a class="sourceLine" id="cb10-14" title="14">                           <span class="dt">p.value =</span> pvalue, <span class="dt">mean_no_insurance =</span> mean1,</a>
-<a class="sourceLine" id="cb10-15" title="15">                           <span class="dt">mean_with_insurance =</span> mean2,</a>
-<a class="sourceLine" id="cb10-16" title="16">                           <span class="dt">diff =</span> mean1 <span class="op">-</span><span class="st"> </span>mean2)]</a>
-<a class="sourceLine" id="cb10-17" title="17">  ttest_table_after_match =<span class="st"> </span><span class="kw">rbind</span>(temp,ttest_table_after_match)</a>
-<a class="sourceLine" id="cb10-18" title="18">}</a>
-<a class="sourceLine" id="cb10-19" title="19"></a>
-<a class="sourceLine" id="cb10-20" title="20"><span class="kw">kable</span>(ttest_table_after_match, <span class="dt">caption =</span> <span class="st">&quot;Matching Results&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">### Create blank data table</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>ttest_table_after_match =<span class="st"> </span><span class="kw">data.table</span>(<span class="dt">varname =</span><span class="kw">character</span>(), <span class="dt">t.value=</span><span class="kw">numeric</span>(),</span>
+<span id="cb10-3"><a href="#cb10-3"></a>                         <span class="dt">p.value =</span> <span class="kw">numeric</span>(), <span class="dt">mean_no_insurance =</span> <span class="kw">numeric</span>(),</span>
+<span id="cb10-4"><a href="#cb10-4"></a>                         <span class="dt">mean_with_insurance =</span> <span class="kw">numeric</span>(), <span class="dt">diff =</span> <span class="kw">numeric</span>())</span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">### T-test for all variables</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">colnames</span>(data_psm[,<span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;ProcedureID&quot;</span>,<span class="st">&quot;weights&quot;</span>)])) {</span>
+<span id="cb10-7"><a href="#cb10-7"></a>  <span class="cf">if</span> (col <span class="op">==</span><span class="st"> &quot;Insurance&quot;</span>) <span class="cf">next</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a>  zz =<span class="st"> </span><span class="kw">t.test</span>(<span class="kw">get</span>(col)<span class="op">~</span><span class="kw">get</span>(<span class="st">&quot;Insurance&quot;</span>),<span class="dt">data =</span> data_psm)</span>
+<span id="cb10-9"><a href="#cb10-9"></a>  tvalue =<span class="st"> </span>zz<span class="op">$</span>statistic[[<span class="dv">1</span>]]</span>
+<span id="cb10-10"><a href="#cb10-10"></a>  pvalue =<span class="st"> </span>zz<span class="op">$</span>p.value</span>
+<span id="cb10-11"><a href="#cb10-11"></a>  mean1 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">1</span>]]</span>
+<span id="cb10-12"><a href="#cb10-12"></a>  mean2 =<span class="st"> </span>zz<span class="op">$</span>estimate[[<span class="dv">2</span>]]</span>
+<span id="cb10-13"><a href="#cb10-13"></a>  temp =<span class="st"> </span>ttest_table_after_match[,<span class="kw">list</span>(<span class="dt">varname =</span> col, <span class="dt">t.value =</span> tvalue,</span>
+<span id="cb10-14"><a href="#cb10-14"></a>                           <span class="dt">p.value =</span> pvalue, <span class="dt">mean_no_insurance =</span> mean1,</span>
+<span id="cb10-15"><a href="#cb10-15"></a>                           <span class="dt">mean_with_insurance =</span> mean2,</span>
+<span id="cb10-16"><a href="#cb10-16"></a>                           <span class="dt">diff =</span> mean1 <span class="op">-</span><span class="st"> </span>mean2)]</span>
+<span id="cb10-17"><a href="#cb10-17"></a>  ttest_table_after_match =<span class="st"> </span><span class="kw">rbind</span>(temp,ttest_table_after_match)</span>
+<span id="cb10-18"><a href="#cb10-18"></a>}</span>
+<span id="cb10-19"><a href="#cb10-19"></a></span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="kw">kable</span>(ttest_table_after_match, <span class="dt">caption =</span> <span class="st">&quot;Matching Results&quot;</span>)</span></code></pre></div>
 <table>
 <caption>Matching Results</caption>
 <thead>
@@ -708,27 +717,27 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tbody>
 <tr class="odd">
 <td align="left">AvgSales</td>
-<td align="right">-2.0092319</td>
-<td align="right">0.0448910</td>
-<td align="right">1.787063e+00</td>
+<td align="right">-1.8858742</td>
+<td align="right">0.0597163</td>
+<td align="right">1.832510e+00</td>
 <td align="right">2.579934e+00</td>
-<td align="right">-0.7928708</td>
+<td align="right">-0.7474241</td>
 </tr>
 <tr class="even">
 <td align="left">GroupPurchase</td>
-<td align="right">0.0000000</td>
-<td align="right">1.0000000</td>
+<td align="right">0.3092044</td>
+<td align="right">0.7572398</td>
+<td align="right">1.255708e-01</td>
 <td align="right">1.187215e-01</td>
-<td align="right">1.187215e-01</td>
-<td align="right">0.0000000</td>
+<td align="right">0.0068493</td>
 </tr>
 <tr class="odd">
 <td align="left">Financing</td>
-<td align="right">0.3972525</td>
-<td align="right">0.6912783</td>
-<td align="right">7.694064e-01</td>
+<td align="right">0.1581048</td>
+<td align="right">0.8744107</td>
+<td align="right">7.625571e-01</td>
 <td align="right">7.579909e-01</td>
-<td align="right">0.0114155</td>
+<td align="right">0.0045662</td>
 </tr>
 <tr class="even">
 <td align="left">Ad</td>
@@ -748,114 +757,114 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tr>
 <tr class="even">
 <td align="left">SurgeonNum</td>
-<td align="right">0.1354074</td>
-<td align="right">0.8923226</td>
-<td align="right">1.168950e+00</td>
+<td align="right">0.2737771</td>
+<td align="right">0.7843234</td>
+<td align="right">1.173516e+00</td>
 <td align="right">1.164384e+00</td>
-<td align="right">0.0045662</td>
+<td align="right">0.0091324</td>
 </tr>
 <tr class="odd">
 <td align="left">Public</td>
-<td align="right">-0.2806548</td>
-<td align="right">0.7790417</td>
-<td align="right">5.936070e-02</td>
+<td align="right">0.0000000</td>
+<td align="right">1.0000000</td>
 <td align="right">6.392690e-02</td>
-<td align="right">-0.0045662</td>
+<td align="right">6.392690e-02</td>
+<td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">PriceOrigin</td>
-<td align="right">0.5090949</td>
-<td align="right">0.6108186</td>
-<td align="right">1.159400e+04</td>
+<td align="right">0.5976922</td>
+<td align="right">0.5502042</td>
+<td align="right">1.171211e+04</td>
 <td align="right">1.095673e+04</td>
-<td align="right">637.2625571</td>
+<td align="right">755.3744292</td>
 </tr>
 <tr class="odd">
 <td align="left">PricePaid</td>
-<td align="right">0.0957227</td>
-<td align="right">0.9237636</td>
-<td align="right">5.409050e+03</td>
+<td align="right">0.1262775</td>
+<td align="right">0.8995420</td>
+<td align="right">5.433555e+03</td>
 <td align="right">5.337893e+03</td>
-<td align="right">71.1575342</td>
+<td align="right">95.6621005</td>
 </tr>
 <tr class="even">
 <td align="left">PriceDeposit</td>
-<td align="right">0.3925306</td>
-<td align="right">0.6947624</td>
-<td align="right">9.149064e+02</td>
+<td align="right">-0.0208389</td>
+<td align="right">0.9833789</td>
+<td align="right">8.719018e+02</td>
 <td align="right">8.740251e+02</td>
-<td align="right">40.8812785</td>
+<td align="right">-2.1232877</td>
 </tr>
 <tr class="odd">
 <td align="left">AvgReviews</td>
-<td align="right">-0.1009635</td>
-<td align="right">0.9196030</td>
-<td align="right">4.197602e-01</td>
+<td align="right">-0.1465361</td>
+<td align="right">0.8835329</td>
+<td align="right">4.173479e-01</td>
 <td align="right">4.253067e-01</td>
-<td align="right">-0.0055465</td>
+<td align="right">-0.0079588</td>
 </tr>
 <tr class="even">
 <td align="left">AvgCompNum</td>
-<td align="right">-0.6446608</td>
-<td align="right">0.5193162</td>
-<td align="right">2.304435e+00</td>
+<td align="right">-0.7739172</td>
+<td align="right">0.4391891</td>
+<td align="right">2.280047e+00</td>
 <td align="right">2.426153e+00</td>
-<td align="right">-0.1217180</td>
+<td align="right">-0.1461058</td>
 </tr>
 <tr class="odd">
 <td align="left">ProcedureAge</td>
-<td align="right">0.5527068</td>
-<td align="right">0.5806063</td>
-<td align="right">7.198630e+00</td>
+<td align="right">0.7950100</td>
+<td align="right">0.4268242</td>
+<td align="right">7.278539e+00</td>
 <td align="right">7.011416e+00</td>
-<td align="right">0.1872146</td>
+<td align="right">0.2671233</td>
 </tr>
 </tbody>
 </table>
 <p>Notice, the p-value of most variables are larger than .05, which means the characteristics of insured and uninsured procedures are now balanced. Now let’s use the new data for multiple regression.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co">## Multiple linear regression</span></a>
-<a class="sourceLine" id="cb11-2" title="2">mlr_after_match =<span class="st"> </span><span class="kw">lm</span>(AvgSales<span class="op">~</span>Insurance <span class="op">+</span><span class="st"> </span>ProcedureAge <span class="op">+</span><span class="st"> </span>AvgCompNum <span class="op">+</span><span class="st"> </span>AvgReviews <span class="op">+</span><span class="st"> </span>PriceDeposit <span class="op">+</span><span class="st"> </span>PricePaid <span class="op">+</span><span class="st"> </span>PriceOrigin <span class="op">+</span><span class="st"> </span>Public <span class="op">+</span><span class="st"> </span>SurgeonNum <span class="op">+</span><span class="st"> </span>ReviewBonus <span class="op">+</span><span class="st"> </span>Ad <span class="op">+</span><span class="st"> </span>Financing <span class="op">+</span><span class="st"> </span>GroupPurchase, <span class="dt">data =</span> data_psm) </a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="co">## Output the regression results</span></a>
-<a class="sourceLine" id="cb11-4" title="4"><span class="kw">summary</span>(mlr_after_match)</a>
-<a class="sourceLine" id="cb11-5" title="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-6" title="6"><span class="co">#&gt; Call:</span></a>
-<a class="sourceLine" id="cb11-7" title="7"><span class="co">#&gt; lm(formula = AvgSales ~ Insurance + ProcedureAge + AvgCompNum + </span></a>
-<a class="sourceLine" id="cb11-8" title="8"><span class="co">#&gt;     AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + </span></a>
-<a class="sourceLine" id="cb11-9" title="9"><span class="co">#&gt;     SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, </span></a>
-<a class="sourceLine" id="cb11-10" title="10"><span class="co">#&gt;     data = data_psm)</span></a>
-<a class="sourceLine" id="cb11-11" title="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-12" title="12"><span class="co">#&gt; Residuals:</span></a>
-<a class="sourceLine" id="cb11-13" title="13"><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></a>
-<a class="sourceLine" id="cb11-14" title="14"><span class="co">#&gt; -31.427  -1.812  -0.839   0.423  91.869 </span></a>
-<a class="sourceLine" id="cb11-15" title="15"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-16" title="16"><span class="co">#&gt; Coefficients:</span></a>
-<a class="sourceLine" id="cb11-17" title="17"><span class="co">#&gt;                 Estimate Std. Error t value Pr(&gt;|t|)    </span></a>
-<a class="sourceLine" id="cb11-18" title="18"><span class="co">#&gt; (Intercept)   -5.875e-01  8.130e-01  -0.723  0.47015    </span></a>
-<a class="sourceLine" id="cb11-19" title="19"><span class="co">#&gt; Insurance      7.390e-01  3.693e-01   2.001  0.04566 *  </span></a>
-<a class="sourceLine" id="cb11-20" title="20"><span class="co">#&gt; ProcedureAge  -4.793e-02  3.849e-02  -1.245  0.21343    </span></a>
-<a class="sourceLine" id="cb11-21" title="21"><span class="co">#&gt; AvgCompNum     7.304e-02  6.789e-02   1.076  0.28232    </span></a>
-<a class="sourceLine" id="cb11-22" title="22"><span class="co">#&gt; AvgReviews     2.278e+00  2.312e-01   9.850  &lt; 2e-16 ***</span></a>
-<a class="sourceLine" id="cb11-23" title="23"><span class="co">#&gt; PriceDeposit  -5.753e-04  2.799e-04  -2.055  0.04014 *  </span></a>
-<a class="sourceLine" id="cb11-24" title="24"><span class="co">#&gt; PricePaid      5.036e-05  4.810e-05   1.047  0.29541    </span></a>
-<a class="sourceLine" id="cb11-25" title="25"><span class="co">#&gt; PriceOrigin   -1.800e-05  2.293e-05  -0.785  0.43275    </span></a>
-<a class="sourceLine" id="cb11-26" title="26"><span class="co">#&gt; Public         4.153e-01  8.897e-01   0.467  0.64079    </span></a>
-<a class="sourceLine" id="cb11-27" title="27"><span class="co">#&gt; SurgeonNum     8.942e-01  3.793e-01   2.357  0.01864 *  </span></a>
-<a class="sourceLine" id="cb11-28" title="28"><span class="co">#&gt; ReviewBonus   -3.502e-01  3.873e+00  -0.090  0.92798    </span></a>
-<a class="sourceLine" id="cb11-29" title="29"><span class="co">#&gt; Ad             4.805e-01  6.934e-01   0.693  0.48849    </span></a>
-<a class="sourceLine" id="cb11-30" title="30"><span class="co">#&gt; Financing      9.963e-01  5.020e-01   1.985  0.04750 *  </span></a>
-<a class="sourceLine" id="cb11-31" title="31"><span class="co">#&gt; GroupPurchase  1.565e+00  5.858e-01   2.672  0.00769 ** </span></a>
-<a class="sourceLine" id="cb11-32" title="32"><span class="co">#&gt; ---</span></a>
-<a class="sourceLine" id="cb11-33" title="33"><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></a>
-<a class="sourceLine" id="cb11-34" title="34"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-35" title="35"><span class="co">#&gt; Residual standard error: 5.457 on 862 degrees of freedom</span></a>
-<a class="sourceLine" id="cb11-36" title="36"><span class="co">#&gt; Multiple R-squared:  0.1427, Adjusted R-squared:  0.1298 </span></a>
-<a class="sourceLine" id="cb11-37" title="37"><span class="co">#&gt; F-statistic: 11.04 on 13 and 862 DF,  p-value: &lt; 2.2e-16</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">## Multiple linear regression</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>mlr_after_match =<span class="st"> </span><span class="kw">lm</span>(AvgSales<span class="op">~</span>Insurance <span class="op">+</span><span class="st"> </span>ProcedureAge <span class="op">+</span><span class="st"> </span>AvgCompNum <span class="op">+</span><span class="st"> </span>AvgReviews <span class="op">+</span><span class="st"> </span>PriceDeposit <span class="op">+</span><span class="st"> </span>PricePaid <span class="op">+</span><span class="st"> </span>PriceOrigin <span class="op">+</span><span class="st"> </span>Public <span class="op">+</span><span class="st"> </span>SurgeonNum <span class="op">+</span><span class="st"> </span>ReviewBonus <span class="op">+</span><span class="st"> </span>Ad <span class="op">+</span><span class="st"> </span>Financing <span class="op">+</span><span class="st"> </span>GroupPurchase, <span class="dt">data =</span> data_psm) </span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co">## Output the regression results</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="kw">summary</span>(mlr_after_match)</span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="co">#&gt; </span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt; lm(formula = AvgSales ~ Insurance + ProcedureAge + AvgCompNum + </span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt;     AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + </span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt;     SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, </span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt;     data = data_psm)</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#&gt; </span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="co">#&gt; -30.118  -1.861  -0.895   0.376  92.370 </span></span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="co">#&gt; </span></span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb11-17"><a href="#cb11-17"></a><span class="co">#&gt;                 Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb11-18"><a href="#cb11-18"></a><span class="co">#&gt; (Intercept)   -5.814e-01  8.282e-01  -0.702   0.4829    </span></span>
+<span id="cb11-19"><a href="#cb11-19"></a><span class="co">#&gt; Insurance      7.150e-01  3.733e-01   1.915   0.0558 .  </span></span>
+<span id="cb11-20"><a href="#cb11-20"></a><span class="co">#&gt; ProcedureAge  -5.485e-02  3.925e-02  -1.398   0.1626    </span></span>
+<span id="cb11-21"><a href="#cb11-21"></a><span class="co">#&gt; AvgCompNum     7.556e-02  6.858e-02   1.102   0.2709    </span></span>
+<span id="cb11-22"><a href="#cb11-22"></a><span class="co">#&gt; AvgReviews     2.183e+00  2.363e-01   9.237   &lt;2e-16 ***</span></span>
+<span id="cb11-23"><a href="#cb11-23"></a><span class="co">#&gt; PriceDeposit  -5.483e-04  2.689e-04  -2.039   0.0418 *  </span></span>
+<span id="cb11-24"><a href="#cb11-24"></a><span class="co">#&gt; PricePaid      4.029e-05  4.554e-05   0.885   0.3766    </span></span>
+<span id="cb11-25"><a href="#cb11-25"></a><span class="co">#&gt; PriceOrigin   -1.638e-05  2.292e-05  -0.715   0.4749    </span></span>
+<span id="cb11-26"><a href="#cb11-26"></a><span class="co">#&gt; Public         5.945e-01  8.902e-01   0.668   0.5044    </span></span>
+<span id="cb11-27"><a href="#cb11-27"></a><span class="co">#&gt; SurgeonNum     8.983e-01  3.871e-01   2.321   0.0205 *  </span></span>
+<span id="cb11-28"><a href="#cb11-28"></a><span class="co">#&gt; ReviewBonus   -3.626e-01  3.914e+00  -0.093   0.9262    </span></span>
+<span id="cb11-29"><a href="#cb11-29"></a><span class="co">#&gt; Ad             4.346e-01  6.985e-01   0.622   0.5340    </span></span>
+<span id="cb11-30"><a href="#cb11-30"></a><span class="co">#&gt; Financing      1.159e+00  5.098e-01   2.274   0.0232 *  </span></span>
+<span id="cb11-31"><a href="#cb11-31"></a><span class="co">#&gt; GroupPurchase  1.376e+00  5.846e-01   2.353   0.0188 *  </span></span>
+<span id="cb11-32"><a href="#cb11-32"></a><span class="co">#&gt; ---</span></span>
+<span id="cb11-33"><a href="#cb11-33"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb11-34"><a href="#cb11-34"></a><span class="co">#&gt; </span></span>
+<span id="cb11-35"><a href="#cb11-35"></a><span class="co">#&gt; Residual standard error: 5.515 on 862 degrees of freedom</span></span>
+<span id="cb11-36"><a href="#cb11-36"></a><span class="co">#&gt; Multiple R-squared:  0.1315, Adjusted R-squared:  0.1184 </span></span>
+<span id="cb11-37"><a href="#cb11-37"></a><span class="co">#&gt; F-statistic: 10.04 on 13 and 862 DF,  p-value: &lt; 2.2e-16</span></span></code></pre></div>
 <p>The effect of insurance with the matched data shows a significant result under .05 significant level.</p>
 </div>
 </div>
 <div id="coarsened-exact-matching" class="section level2">
 <h2>Coarsened Exact Matching</h2>
-<p>Ideally, if there are exactly same two procedures, one is insured and the other is uninsured, comparing their average monthly sales will lead to a very precise estimation of the effect of insurance. However, it is almost impossible to find the exactly same two procedures. Let’s simply use price as the only characteristic of procedures. Although it is difficult to find two procedures with exactly the same price, we may be able to find one insured procedure whose price is $1,000 and the other uninsured procedure whose price is $1,010. Their prices. If we coarsen the exact number of price to some intervals, for example, we define price less than $500 as low price, $500 to $2,000 as medium price, above $2000 as high price. Then, it will be much easier to find matched sample from insured and uninsured procedures. This is the basic rationale of coarsened exact matching.</p>
+<p>Ideally, if there are exactly same two procedures, one is insured and the other is uninsured, comparing their average monthly sales will lead to a very precise estimate of the effect of insurance. However, it is almost impossible to find the exactly same two procedures. Let’s simply use price as the only characteristic of procedures. Although it is difficult to find two procedures with exactly the same price, we may be able to find one insured procedure whose price is $1,000 and the other uninsured procedure whose price is $1,010. Their prices. If we coarsen the exact number of price to some intervals, for example, we define price less than $500 as low price, $500 to $2,000 as medium price, above $2000 as high price. Then, it will be much easier to find matched sample from insured and uninsured procedures. This is the basic rationale of coarsened exact matching.</p>
 <p>Coarsened exact matching allows us to coarsen each covariate automatically or mannually.</p>
 <ul>
 <li>Automatical Coarsening</li>
@@ -865,38 +874,88 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>Manual Coarsening</li>
 </ul>
 <p>In practice, manual coarsening is more reasonable. For example, if the range of price is from 100 to 100,000, it will be meaningless to coarsen</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb12-2" title="2">ProcedureAgeHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>ProcedureAge)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-3" title="3"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;ProcedureAge&quot;</span>)</a>
-<a class="sourceLine" id="cb12-4" title="4"></a>
-<a class="sourceLine" id="cb12-5" title="5">AvgCompNumHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>AvgCompNum)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-6" title="6"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;AvgCompNum&quot;</span>)</a>
-<a class="sourceLine" id="cb12-7" title="7"></a>
-<a class="sourceLine" id="cb12-8" title="8">AvgReviewsHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>AvgReviews)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-9" title="9"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;AvgReviews&quot;</span>)</a>
-<a class="sourceLine" id="cb12-10" title="10"></a>
-<a class="sourceLine" id="cb12-11" title="11">PriceDepositHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>PriceDeposit)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-12" title="12"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;PriceDeposit&quot;</span>)</a>
-<a class="sourceLine" id="cb12-13" title="13"></a>
-<a class="sourceLine" id="cb12-14" title="14">PricePaidHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data[PricePaid<span class="op">&lt;</span><span class="dv">150000</span>], <span class="kw">aes</span>(<span class="dt">x=</span>PricePaid)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-15" title="15"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;PricePaid&quot;</span>)</a>
-<a class="sourceLine" id="cb12-16" title="16"></a>
-<a class="sourceLine" id="cb12-17" title="17">PriceOriginHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>PriceOrigin)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-18" title="18"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;PriceOrigin&quot;</span>)</a>
-<a class="sourceLine" id="cb12-19" title="19"></a>
-<a class="sourceLine" id="cb12-20" title="20">SurgeonNumHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>SurgeonNum)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-21" title="21"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;SurgeonNum&quot;</span>)</a>
-<a class="sourceLine" id="cb12-22" title="22"></a>
-<a class="sourceLine" id="cb12-23" title="23"><span class="kw">library</span>(gridExtra)</a>
-<a class="sourceLine" id="cb12-24" title="24"><span class="kw">grid.arrange</span>( ProcedureAgeHist, AvgCompNumHist,AvgReviewsHist,PriceDepositHist,PricePaidHist,PriceOriginHist,SurgeonNumHist, <span class="dt">ncol=</span><span class="dv">2</span>)</a></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>We can</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>ProcedureAgeHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>ProcedureAge)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;ProcedureAge&quot;</span>)</span>
+<span id="cb12-4"><a href="#cb12-4"></a></span>
+<span id="cb12-5"><a href="#cb12-5"></a>AvgCompNumHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>AvgCompNum)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;AvgCompNum&quot;</span>)</span>
+<span id="cb12-7"><a href="#cb12-7"></a></span>
+<span id="cb12-8"><a href="#cb12-8"></a>AvgReviewsHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>AvgReviews)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;AvgReviews&quot;</span>)</span>
+<span id="cb12-10"><a href="#cb12-10"></a></span>
+<span id="cb12-11"><a href="#cb12-11"></a>PriceDepositHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>PriceDeposit)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;PriceDeposit&quot;</span>)</span>
+<span id="cb12-13"><a href="#cb12-13"></a></span>
+<span id="cb12-14"><a href="#cb12-14"></a>PricePaidHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data[PricePaid<span class="op">&lt;</span><span class="dv">150000</span>], <span class="kw">aes</span>(<span class="dt">x=</span>PricePaid)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;PricePaid&quot;</span>)</span>
+<span id="cb12-16"><a href="#cb12-16"></a></span>
+<span id="cb12-17"><a href="#cb12-17"></a>PriceOriginHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>PriceOrigin)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;PriceOrigin&quot;</span>)</span>
+<span id="cb12-19"><a href="#cb12-19"></a></span>
+<span id="cb12-20"><a href="#cb12-20"></a>SurgeonNumHist &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>SurgeonNum)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">15</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-21"><a href="#cb12-21"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;SurgeonNum&quot;</span>)</span>
+<span id="cb12-22"><a href="#cb12-22"></a></span>
+<span id="cb12-23"><a href="#cb12-23"></a><span class="kw">library</span>(gridExtra)</span>
+<span id="cb12-24"><a href="#cb12-24"></a><span class="kw">grid.arrange</span>( ProcedureAgeHist, AvgCompNumHist,AvgReviewsHist,PriceDepositHist,PricePaidHist,PriceOriginHist,SurgeonNumHist, <span class="dt">ncol=</span><span class="dv">3</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>Notice, there is no sense to coarsen dummy variables (i.e., binary variables) since they are already “coarsened” into two categories. We use 0.5 as the cut point to keep these dummy variables unchanged. You can also use any number strictly between 0 and 1 as the cut point.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>PriceDepositCut =<span class="st"> </span><span class="kw">c</span>(<span class="fl">99.5</span>,<span class="fl">999.5</span>)</span>
+<span id="cb13-2"><a href="#cb13-2"></a>PricePaidCut =<span class="st"> </span><span class="kw">c</span>(<span class="fl">999.5</span>,<span class="fl">4999.5</span>,<span class="fl">9999.5</span>)</span>
+<span id="cb13-3"><a href="#cb13-3"></a>PriceOriginCut =<span class="st"> </span><span class="kw">c</span>(<span class="fl">999.5</span>,<span class="fl">4999.5</span>,<span class="fl">9999.5</span>)</span>
+<span id="cb13-4"><a href="#cb13-4"></a>ProcedureAgeCut =<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>AvgCompNumCut =<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>SurgeonNumCut =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>,<span class="fl">1.5</span>)</span>
+<span id="cb13-7"><a href="#cb13-7"></a>AvgReviewsCut =<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a></span>
+<span id="cb13-9"><a href="#cb13-9"></a>cut_man =<span class="st"> </span><span class="kw">list</span>(<span class="dt">ProcedureAge =</span> ProcedureAgeCut, <span class="dt">AvgCompNum =</span> AvgCompNumCut, <span class="dt">AvgReviews =</span> AvgReviewsCut, <span class="dt">PriceDeposit =</span> PriceDepositCut, <span class="dt">PricePaid =</span> PricePaidCut, <span class="dt">PriceOrigin =</span> PriceOriginCut,  <span class="dt">SurgeonNum =</span> SurgeonNumCut,<span class="dt">Public =</span> <span class="kw">c</span>(<span class="fl">0.5</span>), <span class="dt">ReviewBonus =</span> <span class="kw">c</span>(<span class="fl">0.5</span>),<span class="dt">Ad =</span> <span class="kw">c</span>(<span class="fl">0.5</span>),<span class="dt">Financing =</span> <span class="kw">c</span>(<span class="fl">0.5</span>),<span class="dt">GroupPurchase =</span> <span class="kw">c</span>(<span class="fl">0.5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">### Imbalance before matching</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">imbalance</span>(data<span class="op">$</span>Insurance, data, <span class="dt">drop=</span><span class="kw">c</span>(<span class="st">&quot;ProcedureID&quot;</span>,<span class="st">&quot;AvgSales&quot;</span>, <span class="st">&quot;Insurance&quot;</span>), <span class="dt">breaks =</span> cut_man)</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; </span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt; Multivariate Imbalance Measure: L1=0.377</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt; Percentage of local common support: LCS=50.8%</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt; </span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; Univariate Imbalance Measures:</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#&gt; </span></span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt;                   statistic   type          L1  min           25%</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a><span class="co">#&gt; ProcedureAge  -5.592392e-01 (diff) 0.000000000    0  0.000000e+00</span></span>
+<span id="cb14-11"><a href="#cb14-11"></a><span class="co">#&gt; AvgCompNum    -2.766494e+00 (diff) 0.000000000    0 -7.500000e-01</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a><span class="co">#&gt; AvgReviews    -6.514174e-02 (diff) 0.000000000    0 -9.090909e-02</span></span>
+<span id="cb14-13"><a href="#cb14-13"></a><span class="co">#&gt; PriceDeposit   2.080239e+02 (diff) 0.000000000  -19 -5.600000e+01</span></span>
+<span id="cb14-14"><a href="#cb14-14"></a><span class="co">#&gt; PricePaid      2.420125e+03 (diff) 0.000000000  -89 -3.810000e+02</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a><span class="co">#&gt; PriceOrigin    4.306789e+03 (diff) 0.000000000 -581 -1.700000e+03</span></span>
+<span id="cb14-16"><a href="#cb14-16"></a><span class="co">#&gt; Public        -2.689186e-02 (diff) 0.026891863    0  0.000000e+00</span></span>
+<span id="cb14-17"><a href="#cb14-17"></a><span class="co">#&gt; SurgeonNum    -2.836647e-01 (diff) 0.093587907    0  0.000000e+00</span></span>
+<span id="cb14-18"><a href="#cb14-18"></a><span class="co">#&gt; ReviewBonus    1.354118e-03 (diff) 0.001354118    0  0.000000e+00</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a><span class="co">#&gt; Ad            -6.970953e-02 (diff) 0.069709530    0  0.000000e+00</span></span>
+<span id="cb14-20"><a href="#cb14-20"></a><span class="co">#&gt; Financing     -9.611712e-02 (diff) 0.096117124    0 -1.000000e+00</span></span>
+<span id="cb14-21"><a href="#cb14-21"></a><span class="co">#&gt; GroupPurchase -4.761216e-02 (diff) 0.047612162    0  0.000000e+00</span></span>
+<span id="cb14-22"><a href="#cb14-22"></a><span class="co">#&gt;                         50%         75%   max</span></span>
+<span id="cb14-23"><a href="#cb14-23"></a><span class="co">#&gt; ProcedureAge     0.00000000    0.000000     3</span></span>
+<span id="cb14-24"><a href="#cb14-24"></a><span class="co">#&gt; AvgCompNum      -1.50000000   -4.333333    -9</span></span>
+<span id="cb14-25"><a href="#cb14-25"></a><span class="co">#&gt; AvgReviews      -0.07352941    0.000000    -5</span></span>
+<span id="cb14-26"><a href="#cb14-26"></a><span class="co">#&gt; PriceDeposit   -63.00000000  438.000000     0</span></span>
+<span id="cb14-27"><a href="#cb14-27"></a><span class="co">#&gt; PricePaid     -420.00000000 3200.000000 82000</span></span>
+<span id="cb14-28"><a href="#cb14-28"></a><span class="co">#&gt; PriceOrigin      0.00000000 7000.000000 18999</span></span>
+<span id="cb14-29"><a href="#cb14-29"></a><span class="co">#&gt; Public           0.00000000    0.000000     0</span></span>
+<span id="cb14-30"><a href="#cb14-30"></a><span class="co">#&gt; SurgeonNum       0.00000000   -1.000000    -2</span></span>
+<span id="cb14-31"><a href="#cb14-31"></a><span class="co">#&gt; ReviewBonus      0.00000000    0.000000     0</span></span>
+<span id="cb14-32"><a href="#cb14-32"></a><span class="co">#&gt; Ad               0.00000000    0.000000     0</span></span>
+<span id="cb14-33"><a href="#cb14-33"></a><span class="co">#&gt; Financing        0.00000000    0.000000     0</span></span>
+<span id="cb14-34"><a href="#cb14-34"></a><span class="co">#&gt; GroupPurchase    0.00000000    0.000000     0</span></span>
+<span id="cb14-35"><a href="#cb14-35"></a></span>
+<span id="cb14-36"><a href="#cb14-36"></a><span class="co">### CEM matching</span></span>
+<span id="cb14-37"><a href="#cb14-37"></a>cem_man &lt;-<span class="st"> </span><span class="kw">cem</span>(<span class="dt">treatment =</span> <span class="st">&quot;Insurance&quot;</span>, <span class="dt">data =</span> data, <span class="dt">keep.all=</span><span class="ot">TRUE</span>, <span class="dt">eval.imbalance =</span> <span class="ot">TRUE</span>, <span class="dt">drop =</span> <span class="kw">c</span>(<span class="st">&quot;ProcedureID&quot;</span>,<span class="st">&quot;Insurance&quot;</span>,  <span class="st">&quot;AvgSales&quot;</span>),<span class="dt">cutpoints =</span> cut_man, <span class="dt">L1.breaks =</span> cut_man )</span></code></pre></div>
+</div>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<ul>
+<li><p>The above t-test is not strict enough since variables are not normally distributed and may also be not independent since two procedures from the same hospital could be correlated. One can use some non-parametric methods when assumptions do not hold such as Wilcoxon signed-rank test.</p></li>
+<li><p>CEM dominates PSM and we recommend using CEM instead of PSM. The reason has been explained above: PSM tries to mimic random experiment whose expectation of bias is 0 but CEM tries mimic an experiment with exactly same paired subjects (which is called fully blocked randomized experiment) whose bias is designed to be 0. However, CEM needs us to have some priori knowledge about the covariates to coarsen them.</p></li>
+<li><p>All the matching methods are based on observable covariates that exist in our dataset. If the assignment depends on unobservable confounders, there could still be bias after matching. Matching can help us reduce the unbalance between the treatment and control groups only based on observable characteristics.</p></li>
+</ul>
 </div>
 
-
-
-<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
