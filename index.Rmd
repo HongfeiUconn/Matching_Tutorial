@@ -50,11 +50,19 @@ Our context is one of the largest online platforms for cosmetic procedures in Ch
 
 The platform offers a complication insurance policy, which aims at compensating customers for surgical malpractice or post-treatment complications such as severe infection. However, this insurance policy is only available for a subset of procedures. We are interested in whether the insurance has any effect on the average sales of procedures.
 
+- The following image shows a procedure without insurance option.
 
+![](uninsured.jpg){width=400px}
+
+
+- The following image shows a procedure with insurance option.
+
+![](insured.png){width=400px}
 
 ## Explore Data
 
 ### Read Data
+
 ```{r,  warning = FALSE}
 data = fread("data.csv")
 
@@ -77,7 +85,7 @@ kable(description, caption = "Description of Variables")
 Here, AvgSales is the dependent (or outcome) variable and Insurance is the treatment variable. When Insurance equals to 0, it means this procedure is not offered the complication insurance option, 1 otherwise.
 
 ### Motivation
-To answer the above question, one can first come up with simple linear regression.
+To answer the above question, one may first come up with simple linear regression.
 
 ```{r,  warning = FALSE}
 ## Simple linear regression
@@ -95,6 +103,7 @@ mlr_no_match = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + 
 ## Output the regression results
 kable(summary(mlr_no_match)$coefficients, caption = "Multiple Linear Regression without Matching")
 ```
+
 From the above results, the effect of insurance is not significant anymore after controlling for all the covariates.
 
 ### Why do we want to use matching?
@@ -142,7 +151,7 @@ psm = matchit(Insurance ~  ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit
 
 ## distance: This argument specifies the method used to estimate the distance measure. The default is logistic regression, "logit". A variety of other methods are available.
 ## nearest: This means the matching method we use for PSM is nearest neighbor.
-## ratio: the number of control units to match to each treated unit (default = 1).
+## ratio: the number of control units to match to each treated unit (default = 1, one-to-one matching).
 ## caliper: the number of standard deviations of the distance measure within which to draw control units (default = 0, no caliper matching). If a caliper is specified, a control unit within the caliper for a treated unit is randomly selected as the match for that treated unit. I
 ```
 
@@ -157,13 +166,7 @@ kable(as.table(psm_result$nn), caption = "Matching Results")
 
 The above table means: 438 procedures out of uninsured procedures are matched with 438 procedures out of insured procedures. Since we used one-to-one matching, the numbers of matched insured and uninsured procedures are the same. For the unmatched procedures, we can directly remove them. Then we can use the rest of sample for further analysis.
 
-Here, we mainly focus on "weights", which is a dummy variable and means whether the procedure has been selected during the matching process. If a procedure's weight is 0, it means this procedure is in unmatched group.
-
-
-```{r,  warning = FALSE}
-
-```
-To get the data after matching, we can run the following commands:
+To use the matching results, we can pick up one element from the result list--"weights", which is a dummy variable and means whether the procedure has been selected during the matching process. If a procedure's weight is 0, it means this procedure is in unmatched group. To get the data after matching, we can run the following commands:
 
 ```{r,  warning = FALSE}
 ## First combine weights to the original data set
@@ -172,7 +175,6 @@ data_psm = cbind(data, weights = psm$weights)
 data_psm = data_psm[!(weights == 0)]
 
 ```
-
 
 ### Compare the Mean after Matching
 
@@ -202,6 +204,8 @@ kable(ttest_table_after_match, caption = "Matching Results")
 
 Notice, the p-value of most variables are larger than .05, which means the characteristics of insured and uninsured procedures are now balanced. Now let's use the new data for multiple regression.
 
+Next, we use the matching data to run the same multiple regression as above.
+
 ```{r,  warning = FALSE}
 ## Multiple linear regression
 mlr_after_psm = lm(AvgSales~Insurance + ProcedureAge + AvgCompNum + AvgReviews + PriceDeposit + PricePaid + PriceOrigin + Public + SurgeonNum + ReviewBonus + Ad + Financing + GroupPurchase, data = data_psm) 
@@ -222,24 +226,31 @@ Coarsened exact matching allows us to coarsen each covariate automatically or ma
 
 Coarsened exact matching allows us to coarsen each covariate automatically or mannually. Without any priori knowledge, we can first try automatical coarsening. Several options are available such as "sturges". How to choose the appropriate option depends on the distribution of the variables. Notice, there is no sense to coarsen dummy variables (i.e., binary variables) since they are already "coarsened" into two categories. In our case, ProcedureAge, AvgCompNum, AvgReviews, PriceDeposit, PricePaid, and PriceOrigin are continuous variables. We use "sturges" option to coarsen these continuous variables. SurgeonNum is a categorical variable including five categories, we coarsen it into two categories: procedures that one or less physician is available, and procedures that multiple physicians are available. All the other variables are dummies, so we use 0.5 as the cut point to keep them unchanged. You can also use any number strictly between 0 and 1 as the cut point.
 
-The following codes show how we coarsen each variable
+The following codes show how we coarsen each variable.
 
 ```{r,  warning = FALSE}
+## Automatical coarsening for continuous variables
 cut_auto = list(PriceDeposit = "sturges",PricePaid = "sturges", PriceOrigin = "sturges",ProcedureAge = "sturges", AvgCompNum = "sturges", SurgeonNum = c(1.5), AvgReviews = "sturges", Public = c(0.5), ReviewBonus = c(0.5),Ad = c(0.5),Financing = c(0.5),GroupPurchase = c(0.5))
 ```
 
 We first check imbalance before matching.
 
 ```{r,  warning = FALSE}
-imbalance(data$Insurance, data, drop=c("ProcedureID","AvgSales","Insurance"), breaks = cut_auto)
+## Check the imbalance
+rr = imbalance(data$Insurance, data, drop=c("ProcedureID","AvgSales","Insurance"), breaks = cut_auto)
+kable(rr$tab, caption = "Imbalance before CEM from Automatical Coarsening")
 ```
 
-
-We next run CEM with automatical coarsening.
+The multivariate imbalance measure $L1$ ranges from 0 to 1, where a value of 1 indicates a complete separation of two distributions and 0 indicates perfect matching. For more details, please refer to [this paper](https://cran.r-project.org/web/packages/cem/vignettes/cem.pdf). We next run CEM with automatical coarsening.
 
 ```{r,  warning = FALSE}
 cem_auto <- cem(treatment = "Insurance", data = data, cutpoints = cut_auto, keep.all=TRUE,eval.imbalance = TRUE, drop = c("ProcedureID","AvgSales","Insurance"), L1.breaks = cut_auto )
+kable(cem_auto$imbalance$tab, caption = "Imbalance after CEM from Automatical Coarsening")
 ```
+
+To see the results of CEM from automatical coarsening, one can use the command "summary(cem_auto)". From the above table, we can see the $L1$ statistics decrease a lot after matching.
+
+### Manual Coarsening
 
 How to choose the appropriate option for automatical coarsening depends on the distribution of the variables. For example, sturges rule works well for normally distributed variable. Therefore, it is important to check the distributions of all continuous variables before matching. The following histogram shows that most variables are highly right-skewed. Therefore, using "sturges" rule as the approach of automatical coarsening may not be a good choice.
 
@@ -271,8 +282,6 @@ grid.arrange( ProcedureAgeHist, AvgCompNumHist,AvgReviewsHist,PriceDepositHist,P
 ```
 
 
-### Manual Coarsening
-
 In practice, manual coarsening is more reasonable. For example, if the range of price is from \$100 to \$100,00, we can separate this interval into three pieces with two cut points (e.g., \$499.5 and \$1999.5):
 
  - \$100-\$500: low price 
@@ -300,14 +309,19 @@ After defining the cut points, we can run CEM with the manual coarsening. We fir
 
 ```{r,  warning = FALSE}
 ### Imbalance before matching
-imbalance(data$Insurance, data, drop=c("ProcedureID","AvgSales", "Insurance"), breaks = cut_man)
+rr = imbalance(data$Insurance, data, drop=c("ProcedureID","AvgSales", "Insurance"), breaks = cut_man)
+kable(rr$tab, caption = "Imbalance before CEM from Manual Coarsening")
+
 ```
 
-Next, we run the command for CEM.
+Next, we run the command for CEM. Notice, the $L1$ statistics decrease a lot after matching.
 
 ```{r,  warning = FALSE}
 ### CEM matching
 cem_man <- cem(treatment = "Insurance", data = data, keep.all=TRUE, eval.imbalance = TRUE, drop = c("ProcedureID","Insurance",  "AvgSales"),cutpoints = cut_man, L1.breaks = cut_man )
+
+## Show imbalance measurement after matching
+kable(cem_man$imbalance$tab, caption = "Imbalance after CEM from Manual Coarsening")
 
 ```
 
@@ -338,7 +352,7 @@ From the above results, the impact of insurance is positive under .01 significan
 
 - The above t-test is not strict enough since variables are not normally distributed and may also be not independent since two procedures from the same hospital could be correlated. One can use some non-parametric methods when assumptions do not hold such as Wilcoxon signed-rank test.
 
-- CEM dominates PSM and we recommend using CEM instead of PSM. The reason has been explained above: PSM tries to mimic random experiment whose expectation of bias is 0 but CEM tries mimic an experiment with exactly same paired subjects (which is called fully blocked randomized experiment) whose bias is designed to be 0. However, CEM needs us to have some priori knowledge about the covariates to coarsen them.
+- CEM dominates PSM and we recommend using CEM instead of PSM [cite](https://gking.harvard.edu/files/gking/files/psnot.pdf). The reason has been explained above: PSM tries to mimic random experiment whose expectation of bias is 0 but CEM tries mimic an experiment with exactly same paired subjects, which is called [fully blocked randomized experiment](https://gking.harvard.edu/publications/why-propensity-scores-should-not-be-used-formatching), whose bias is designed to be 0. However, CEM needs us to have some priori knowledge about the covariates to coarsen them.
 
 - All the matching methods are based on observable covariates that exist in our dataset. If the assignment depends on unobservable confounders, there could still be bias after matching. Matching can help us reduce the unbalance between the treatment and control groups only based on observable characteristics.
 
